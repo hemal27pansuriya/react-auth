@@ -19,6 +19,12 @@ const Register = () => {
 
   const validateRegData = (regData) => {
     const { sEmail, sMobile, sPassword, sUsername } = regData
+    setValidateMsg({
+      sUsernameMsg: '',
+      sEmailMsg: '',
+      sMobileMsg: '',
+      sPasswordMsg: ''
+    })
     let isInvalid = false
     if (!sUsername || !validateUsername(sUsername)) {
       console.log('username');
@@ -37,7 +43,7 @@ const Register = () => {
       isInvalid = true
     }
     if (!sMobile || !validateMobile(sMobile)) {
-      console.log('mobile');
+      console.log('mobile', sMobile, validateMobile(sMobile));
       setValidateMsg({
         ...validateMsg,
         sMobileMsg: 'Mobile is invalid'
@@ -61,7 +67,21 @@ const Register = () => {
     const valRes = validateRegData(regData)
     console.log('valMsg', valRes, validateMsg);
     if (!valRes) return
-    console.log('username, email, mobile, password', regData)
+    const usersData = JSON.parse(localStorage.getItem('usersData')) || []
+    const isExists = usersData.find(user => user.sEmail === regData.sEmail || user.sUsername === regData.sUsername || user.sMobile === regData.sMobile)
+    if (isExists) {
+      alert('User already registered')
+      navigate('/login')
+    }
+    const newUser = {
+      sEmail: regData.sEmail,
+      sMobile: regData.sMobile,
+      sPassword: regData.sPassword,
+      sUsername: regData.sUsername
+    }
+    usersData.push(newUser)
+    localStorage.setItem('usersData', JSON.stringify(usersData))
+    alert('User registration successful!')
     navigate('/dashboard')
   }
   return (

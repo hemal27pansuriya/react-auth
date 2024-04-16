@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
+import TodoApp from "./TodoApp";
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -29,7 +30,7 @@ const Dashboard = () => {
         </button>
       </nav>
       <main className="flex-1 bg-gray-100 overflow-y-auto p-4">
-
+        <TodoApp sUsername={currentUser} />
       </main>
     </div>
   )

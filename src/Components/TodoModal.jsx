@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import PropTypes from "prop-types";
 
 const TodoModal = ({ isOpen, onClose, onSubmit, initialValue = '' }) => {
     const [value, setValue] = useState(initialValue);
+    const inputRef = useRef()
+
+    useEffect(() => {
+        if (inputRef.current) inputRef.current.focus();
+    }, [])
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -43,6 +49,7 @@ const TodoModal = ({ isOpen, onClose, onSubmit, initialValue = '' }) => {
                         <form onSubmit={handleSubmit}>
                             <input
                                 type="text"
+                                ref={inputRef}
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
                                 className="border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
@@ -58,7 +65,6 @@ const TodoModal = ({ isOpen, onClose, onSubmit, initialValue = '' }) => {
                             </div>
                         </form>
                     </div>
-                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
                 </div>
             )}
         </>

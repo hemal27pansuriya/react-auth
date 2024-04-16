@@ -7,7 +7,7 @@ export const validatePassword = (pass) => {
 export const validateUsername = (sUsername) => /^\w{3,15}$/.test(sUsername)
 
 export const validateMobile = (mobile) => {
-    return !!mobile.match(/^\+?[1-9][0-9]{8,12}$/) // !mobile.match(/^\d{10}$/)
+    return !!mobile.match(/^\d{10}$/)
 }
 
 export const validateEmail = (email) => {

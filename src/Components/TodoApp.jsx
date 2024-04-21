@@ -14,7 +14,7 @@ const TodoApp = ({ sUsername }) => {
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
         const currTodos = todoData.filter((todo) => todo.sUsername === sUsername);
-        setTodos(currTodos);
+        setTodos(currTodos)
         setAllTodos(todoData)
     }, [sUsername])
 
@@ -114,6 +114,36 @@ const TodoApp = ({ sUsername }) => {
                         >
                             Delete
                         </button>
+                        <ul>
+                            {todo.aSubTodos && todo.aSubTodos.length &&
+                                todo.aSubTodos.map((subTodo, index) => {
+                                    <li key={index}>
+                                        <input
+                                            type="text"
+                                            checked={subTodo.bCompleted}
+                                            className='mr-2'
+                                        />
+                                        <span className={`${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}>
+                                            {subTodo.sTitle}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="ml-10 text-blue-500 hover:text-blue-600"
+                                            onClick={() => handleOpenModal(todo)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="ml-10 text-blue-500 hover:text-blue-600"
+                                            onClick={() => handleConfirmModal(todo, true)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </li>
+                                })
+                            }
+                        </ul>
                     </li>
                 ))}
             </ul>

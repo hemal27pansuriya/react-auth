@@ -3,15 +3,20 @@ import PropTypes from "prop-types";
 
 const TodoModal = ({ isOpen, onClose, onSubmit, initialValue = '' }) => {
     const [value, setValue] = useState(initialValue);
+    const [validateMsg, setValidateMsg] = useState('')
     const inputRef = useRef()
 
     useEffect(() => {
-        if (inputRef.current) inputRef.current.focus();
-    }, [])
+        setValue(initialValue)
+        if (isOpen) {
+            inputRef.current.focus();
+        }
+    }, [initialValue, isOpen])
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!value) return setValidateMsg('Please enter a value')
         onSubmit(value);
         setValue('');
         onClose();
@@ -29,7 +34,10 @@ const TodoModal = ({ isOpen, onClose, onSubmit, initialValue = '' }) => {
                             <button
                                 type="button"
                                 className="text-gray-500 hover:text-gray-700"
-                                onClick={onClose}
+                                onClick={() => {
+                                    setValidateMsg('')
+                                    onClose();
+                                }}
                             >
                                 <svg
                                     className="h-6 w-6"
@@ -51,10 +59,14 @@ const TodoModal = ({ isOpen, onClose, onSubmit, initialValue = '' }) => {
                                 type="text"
                                 ref={inputRef}
                                 value={value}
-                                onChange={(e) => setValue(e.target.value)}
+                                onChange={(e) => {
+                                    setValidateMsg('')
+                                    setValue(e.target.value)
+                                }}
                                 className="border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
                                 placeholder="Enter todo..."
                             />
+                            {validateMsg && <p className='text-red-500 text-xs mb-1'>{validateMsg}</p>}
                             <div className="flex justify-end">
                                 <button
                                     type="submit"

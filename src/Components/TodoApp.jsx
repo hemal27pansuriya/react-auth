@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react';
 import TodoModal from './TodoModal';
 import PropTypes from 'prop-types'
+import ConfirmModal from './ConfirmModal';
 
 const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
+    // eslint-disable-next-line no-unused-vars
     const [allTodos, setAllTodos] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTodo, setEditingTodo] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
         const currTodos = todoData.filter((todo) => todo.sUsername === sUsername);
         setTodos(currTodos);
         setAllTodos(todoData)
-    }, [])
+    }, [sUsername])
 
     const handleAddTodo = (text) => {
         const iId = todos.length ? todos.length + 1 : 1;
@@ -23,30 +26,60 @@ const TodoApp = ({ sUsername }) => {
             sUsername,
             iId
         }
-        console.log('26', newTodo);
         setTodos([...todos, newTodo]);
-        setAllTodos([...allTodos, newTodo]);
-        console.log('29', { todos, allTodos });
-        localStorage.setItem('todoData', JSON.stringify(allTodos));
+        const updatedTodos = [...allTodos, newTodo];
+        setAllTodos(updatedTodos)
+        localStorage.setItem('todoData', JSON.stringify(updatedTodos));
     };
 
     const handleUpdateTodo = (text) => {
         const newTodos = todos.map((todo) =>
-            todo === editingTodo ? { ...todo, text } : todo
+            todo === editingTodo ? { ...todo, sTitle: text } : todo
         );
+        const newAllTodos = allTodos.map((todo) =>
+            todo === editingTodo ? { ...todo, sTitle: text } : todo
+        )
         setTodos(newTodos);
+        setAllTodos(newAllTodos);
+        localStorage.setItem('todoData', JSON.stringify(newAllTodos))
         setEditingTodo(null);
     };
+
+    const handleDeleteTodo = () => {
+        const newTodos = todos.filter((todo) => todo !== editingTodo);
+        const newAllTodos = allTodos.filter((todo) => todo !== editingTodo);
+        setTodos(newTodos);
+        setAllTodos(newAllTodos);
+        localStorage.setItem('todoData', JSON.stringify(newAllTodos))
+        setEditingTodo(null);
+    }
 
     const handleOpenModal = (todo = null) => {
         setEditingTodo(todo);
         setIsModalOpen(true);
     };
 
+    const handleConfirmModal = (todo = null) => {
+        setEditingTodo(todo);
+        setIsConfirmModalOpen(true)
+    }
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setEditingTodo(null);
     };
+
+    const handleCheckbox = (iId) => {
+        const newTodos = todos.map((t) =>
+            t.iId === iId ? { ...t, bCompleted: !t.bCompleted } : t
+        );
+        const newAllTodos = allTodos.map((t) =>
+            t.iId === iId && t.sUsername === sUsername ? { ...t, bCompleted: !t.bCompleted } : t
+        )
+        setTodos(newTodos);
+        setAllTodos(newAllTodos);
+        localStorage.setItem('todoData', JSON.stringify(newAllTodos))
+    }
 
     return (
         <div className="container mx-auto p-4">
@@ -58,11 +91,7 @@ const TodoApp = ({ sUsername }) => {
                             type="checkbox"
                             checked={todo.bCompleted}
                             onChange={() =>
-                                setTodos(
-                                    todos.map((t, i) =>
-                                        i === index ? { ...t, bCompleted: !t.bCompleted } : t
-                                    )
-                                )
+                                handleCheckbox(todo.iId)
                             }
                             className="mr-2"
                         />
@@ -73,10 +102,17 @@ const TodoApp = ({ sUsername }) => {
                         </span>
                         <button
                             type="button"
-                            className="ml-auto text-blue-500 hover:text-blue-600"
+                            className="ml-10 text-blue-500 hover:text-blue-600"
                             onClick={() => handleOpenModal(todo)}
                         >
                             Edit
+                        </button>
+                        <button
+                            type="button"
+                            className="ml-10 text-blue-500 hover:text-blue-600"
+                            onClick={() => handleConfirmModal(todo, true)}
+                        >
+                            Delete
                         </button>
                     </li>
                 ))}
@@ -93,6 +129,12 @@ const TodoApp = ({ sUsername }) => {
                 onClose={handleCloseModal}
                 onSubmit={editingTodo ? handleUpdateTodo : handleAddTodo}
                 initialValue={editingTodo ? editingTodo.sTitle : ''}
+            />
+            <ConfirmModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onSubmit={handleDeleteTodo}
+                title='Are you sure want to delete?'
             />
         </div>
     );

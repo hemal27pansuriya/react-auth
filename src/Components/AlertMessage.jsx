@@ -15,7 +15,6 @@ const AlertMessage = ({ message, duration = 2000 }) => {
             setVisible(true)
         }
     }, [message])
-    console.log('object4', message, duration, visible)
     if (!visible) return null
     return (
         <div

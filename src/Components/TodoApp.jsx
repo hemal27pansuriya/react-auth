@@ -2,14 +2,18 @@ import { useEffect, useState } from 'react';
 import TodoModal from './TodoModal';
 import PropTypes from 'prop-types'
 import ConfirmModal from './ConfirmModal';
+import SubTodos from './SubTodos';
+import SubTodoModal from './SubTodoModal';
 
 const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
     // eslint-disable-next-line no-unused-vars
     const [allTodos, setAllTodos] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSubModalOpen, setIsSubModalOpen] = useState(false);
     const [editingTodo, setEditingTodo] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [openTodo, setOpenTodo] = useState(null)
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
@@ -81,6 +85,17 @@ const TodoApp = ({ sUsername }) => {
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
     }
 
+    const handleOpenSubTodoModal = (todo) => {
+        console.log('object');
+        setOpenTodo(todo)
+        setIsSubModalOpen(true)
+    }
+
+    const handleCloseSubModal = () => {
+        setIsSubModalOpen(false)
+        setOpenTodo(null)
+    }
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo App</h1>
@@ -97,6 +112,7 @@ const TodoApp = ({ sUsername }) => {
                         />
                         <span
                             className={`${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                            onClick={() => handleOpenSubTodoModal(todo)}
                         >
                             {todo.sTitle}
                         </span>
@@ -114,36 +130,7 @@ const TodoApp = ({ sUsername }) => {
                         >
                             Delete
                         </button>
-                        <ul>
-                            {todo.aSubTodos && todo.aSubTodos.length &&
-                                todo.aSubTodos.map((subTodo, index) => {
-                                    <li key={index}>
-                                        <input
-                                            type="text"
-                                            checked={subTodo.bCompleted}
-                                            className='mr-2'
-                                        />
-                                        <span className={`${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}>
-                                            {subTodo.sTitle}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            className="ml-10 text-blue-500 hover:text-blue-600"
-                                            onClick={() => handleOpenModal(todo)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="ml-10 text-blue-500 hover:text-blue-600"
-                                            onClick={() => handleConfirmModal(todo, true)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </li>
-                                })
-                            }
-                        </ul>
+                        <SubTodos />
                     </li>
                 ))}
             </ul>
@@ -165,6 +152,12 @@ const TodoApp = ({ sUsername }) => {
                 onClose={() => setIsConfirmModalOpen(false)}
                 onSubmit={handleDeleteTodo}
                 title='Are you sure want to delete?'
+            />
+            <SubTodoModal
+                isOpen={isSubModalOpen}
+                onClose={handleCloseSubModal}
+                todo={openTodo}
+                allTodos={allTodos}
             />
         </div>
     );

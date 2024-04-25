@@ -1,12 +1,49 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from "prop-types";
 
 const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
     const [validateMsg, setValidateMsg] = useState('')
+    const [subTodoText, setSubTodoText] = useState('')
+    const [subTodo, setSubTodo] = useState({})
+    useEffect(() => {
+        setSubTodo({
+            ...todo
+        })
+    }, [todo])
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onClose();
+    const handleAddSubTodo = (subTodo) => {
+        if (!subTodo) return setValidateMsg('Please enter a value')
+        const updatedTodos = allTodos.map((t) => {
+            if (t.iId === todo.iId) {
+                const aSubTodos = t.aSubTodos || []
+                aSubTodos.push({ iId: todo?.aSubTodos?.length + 1 || 1, sTitle: subTodo, bCompleted: false })
+                return {
+                    ...t,
+                    aSubTodos
+                }
+            }
+            return t
+        })
+        console.log('212121--', updatedTodos);
+        localStorage.setItem('todoData', JSON.stringify(updatedTodos))
+        setSubTodoText('')
+        onClose()
+    }
+
+    const handleSubTodoCheckboxChange = () => {
+        const newTodos = allTodos.map((t) =>
+            t.iId === subTodo.iId ? {
+                ...t,
+                aSubTodos: t.aSubTodos.map((st) =>
+                    st.sTitle === subTodo.sTitle ? { ...st, bCompleted: !st.bCompleted } : st
+                )
+            } : t
+        );
+        setSubTodo({
+            ...subTodo,
+            bCompleted: !subTodo.bCompleted
+        });
+        localStorage.setItem('todoData', JSON.stringify(newTodos));
     };
 
     return (
@@ -42,32 +79,49 @@ const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
                                 </svg>
                             </button>
                         </div>
-                        {todo.aSubTodos && todo.aSubTodos.length &&
-                            todo.aSubTodos.map((subTodo, index) => {
-                                <input
-                                    type="checkbox"
-                                    checked={todo.bCompleted}
-                                    onChange={() =>
-                                        console.log('yes')
-                                    }
-                                    className="mr-2"
-                                />
-                            })
+                        {subTodo.aSubTodos && subTodo.aSubTodos.length &&
+                            subTodo.aSubTodos.map((subTodo, i) => (
+                                <div
+                                    key={i}
+                                    className='flex'
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={subTodo.bCompleted}
+                                        onChange={() =>
+                                            handleSubTodoCheckboxChange()
+                                        }
+                                        className="mr-2"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={subTodo.sTitle}
+                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4 ${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                                    />
+                                </div>
+                            ))
                         }
-                        <form onSubmit={handleSubmit}>
+                        <div className='flex'>
                             <input
                                 type="text"
-                                value="hemal"
-                                onChange={() => {
+                                value={subTodoText}
+                                onChange={(e) => {
                                     setValidateMsg('')
+                                    setSubTodoText(e.target.value)
                                 }}
-                                className="border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
+                                className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
                                 placeholder="Enter todo..."
                             />
-                            {validateMsg && <p className='text-red-500 text-xs mb-1'>{validateMsg}</p>}
-                        </form>
+                            <button
+                                className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10"
+                                onClick={() => handleAddSubTodo(subTodo)}
+                            >
+                                Add
+                            </button>
+                        </div>
+                        {validateMsg && <p className='text-red-500 text-xs mb-1'>{validateMsg}</p>}
                     </div>
-                </div>
+                </div >
             )}
         </>
     );

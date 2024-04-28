@@ -1,22 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PropTypes from "prop-types";
 
-const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
+const SubTodoModal = ({ isOpen, onClose, todo }) => {
     const [validateMsg, setValidateMsg] = useState('')
     const [subTodoText, setSubTodoText] = useState('')
     const [subTodo, setSubTodo] = useState({})
+    const [subTodoNew, setSubTodoNew] = useState('')
+    const [editingSTId, setEditingSTId] = useState(null)
+    const [allTodos, setAllTodos] = useState(null)
+    const inputRef = useRef(null)
+
     useEffect(() => {
-        setSubTodo({
-            ...todo
-        })
+        if (todo) {
+            const latestTodos = JSON.parse(localStorage.getItem('todoData'))
+            const latestSubTodo = latestTodos.find(t => t.iId === todo.iId && t.sUsername === todo.sUsername)
+            setSubTodo({
+                ...latestSubTodo
+            })
+            setAllTodos(latestTodos)
+        }
     }, [todo])
 
-    const handleAddSubTodo = (subTodo) => {
-        if (!subTodo) return setValidateMsg('Please enter a value')
+    const handleAddSubTodo = () => {
+        if (!subTodoNew) return setValidateMsg('Please enter a value')
+        const newST = { iId: subTodo?.aSubTodos?.length + 1 || 1, sTitle: subTodoNew, bCompleted: false }
         const updatedTodos = allTodos.map((t) => {
-            if (t.iId === todo.iId) {
+            if (t.iId === subTodo.iId) {
                 const aSubTodos = t.aSubTodos || []
-                aSubTodos.push({ iId: todo?.aSubTodos?.length + 1 || 1, sTitle: subTodo, bCompleted: false })
+                aSubTodos.push(newST)
                 return {
                     ...t,
                     aSubTodos
@@ -24,27 +35,85 @@ const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
             }
             return t
         })
-        console.log('212121--', updatedTodos);
         localStorage.setItem('todoData', JSON.stringify(updatedTodos))
-        setSubTodoText('')
-        onClose()
+        setSubTodo(updatedTodos.find(t => t.iId === subTodo.iId && t.sUsername === subTodo.sUsername));
+        setSubTodoNew('')
+        setAllTodos(updatedTodos)
     }
 
-    const handleSubTodoCheckboxChange = () => {
+    const handleSubTodoCheckboxChange = (iId) => {
+        let newTodos = allTodos.map((t) =>
+            t.iId === subTodo.iId ? {
+                ...t,
+                aSubTodos: t.aSubTodos.map((st) =>
+                    st.iId === iId ? { ...st, bCompleted: !st.bCompleted } : st
+                )
+            } : t
+        );
+        const newST = newTodos.find(t => t.iId === subTodo.iId && t.sUsername === subTodo.sUsername).aSubTodos
+        const allChecked = newST.every(st => st.bCompleted)
+        newTodos = newTodos.map((t) =>
+            t.iId === subTodo.iId ? {
+                ...t,
+                bCompleted: allChecked
+            } : t
+        );
+        const curr = {
+            ...subTodo,
+            aSubTodos: newST
+        }
+        setSubTodo(curr);
+        setAllTodos(newTodos)
+        localStorage.setItem('todoData', JSON.stringify(newTodos));
+    };
+
+    const handleSubTodoEdit = (iId, value) => {
+        setEditingSTId(iId);
+        setSubTodoText(value)
+        // inputRef.current.focus()
+    }
+
+    const handleSubTodoSave = (iId) => {
         const newTodos = allTodos.map((t) =>
             t.iId === subTodo.iId ? {
                 ...t,
                 aSubTodos: t.aSubTodos.map((st) =>
-                    st.sTitle === subTodo.sTitle ? { ...st, bCompleted: !st.bCompleted } : st
+                    st.iId === iId ? { ...st, sTitle: subTodoText } : st
                 )
             } : t
         );
-        setSubTodo({
+        const curr = {
             ...subTodo,
-            bCompleted: !subTodo.bCompleted
-        });
+            aSubTodos: newTodos.find(t => t.iId === subTodo.iId).aSubTodos
+        }
+        setSubTodo(curr);
+        setAllTodos(newTodos)
+        setEditingSTId(null)
+        setSubTodoText('')
         localStorage.setItem('todoData', JSON.stringify(newTodos));
-    };
+    }
+
+    const handleSubTodoDelete = (iId) => {
+        const newTodos = allTodos.map((t) =>
+            t.iId === subTodo.iId ? {
+                ...t,
+                aSubTodos: t.aSubTodos.filter(st => st.iId !== iId)
+            } : t
+        );
+        const curr = {
+            ...subTodo,
+            aSubTodos: newTodos.find(t => t.iId === subTodo.iId).aSubTodos
+        }
+        setSubTodo(curr);
+        setAllTodos(newTodos)
+        localStorage.setItem('todoData', JSON.stringify(newTodos));
+    }
+
+    useEffect(() => {
+        if (inputRef.current && editingSTId !== null) {
+            inputRef.current.focus();
+        }
+    }, [editingSTId]);
 
     return (
         <>
@@ -52,7 +121,7 @@ const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
                         <h2 className="text-lg font-semibold">
-                            {todo.sTitle}
+                            {subTodo.sTitle}
                         </h2>
                         <div className="flex justify-between items-center mb-4">
                             <p className='text-sm'>Sub Todos</p>
@@ -61,6 +130,8 @@ const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
                                 className="text-gray-500 hover:text-gray-700"
                                 onClick={() => {
                                     setValidateMsg('')
+                                    setSubTodoNew('')
+                                    setEditingSTId(null)
                                     onClose();
                                 }}
                             >
@@ -79,7 +150,7 @@ const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
                                 </svg>
                             </button>
                         </div>
-                        {subTodo.aSubTodos && subTodo.aSubTodos.length &&
+                        {subTodo.aSubTodos && subTodo.aSubTodos.length > 0 &&
                             subTodo.aSubTodos.map((subTodo, i) => (
                                 <div
                                     key={i}
@@ -89,36 +160,65 @@ const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
                                         type="checkbox"
                                         checked={subTodo.bCompleted}
                                         onChange={() =>
-                                            handleSubTodoCheckboxChange()
+                                            handleSubTodoCheckboxChange(subTodo.iId)
                                         }
                                         className="mr-2"
                                     />
-                                    <input
+                                    {editingSTId === subTodo.iId ? <input
                                         type="text"
+                                        ref={inputRef}
+                                        value={subTodoText}
+                                        onChange={e => setSubTodoText(e.target.value)}
+                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4 ${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                                    /> : <input
+                                        type="text"
+                                        readOnly
                                         value={subTodo.sTitle}
-                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4 ${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
-                                    />
+                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4 ${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                                    />}
+                                    {editingSTId === subTodo.iId ? <button
+                                        className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
+                                        onClick={() => handleSubTodoSave(subTodo.iId)}
+                                    >
+                                        Save
+                                    </button> : <>
+                                        <button
+                                            className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
+                                            onClick={() => handleSubTodoEdit(subTodo.iId, subTodo.sTitle)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className='ml-2 bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
+                                            onClick={() => handleSubTodoDelete(subTodo.iId)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>}
                                 </div>
                             ))
                         }
-                        <div className='flex'>
-                            <input
-                                type="text"
-                                value={subTodoText}
-                                onChange={(e) => {
-                                    setValidateMsg('')
-                                    setSubTodoText(e.target.value)
-                                }}
-                                className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
-                                placeholder="Enter todo..."
-                            />
-                            <button
-                                className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10"
-                                onClick={() => handleAddSubTodo(subTodo)}
-                            >
-                                Add
-                            </button>
-                        </div>
+                        {(subTodo.aSubTodos && subTodo.aSubTodos.length < 3 || !subTodo.aSubTodos) &&
+                            <form onSubmit={handleAddSubTodo}>
+                                <div className='flex'>
+                                    <input
+                                        type="text"
+                                        value={subTodoNew}
+                                        onChange={(e) => {
+                                            setValidateMsg('')
+                                            setSubTodoNew(e.target.value)
+                                        }}
+                                        className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
+                                        placeholder="Enter todo..."
+                                    />
+                                    <button
+                                        type='submit'
+                                        className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                            </form>}
                         {validateMsg && <p className='text-red-500 text-xs mb-1'>{validateMsg}</p>}
                     </div>
                 </div >
@@ -130,8 +230,7 @@ const SubTodoModal = ({ isOpen, onClose, todo, allTodos }) => {
 SubTodoModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    todo: PropTypes.object,
-    allTodos: PropTypes.array
+    todo: PropTypes.object
 }
 
 export default SubTodoModal;

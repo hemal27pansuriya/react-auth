@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import TodoModal from './TodoModal';
 import PropTypes from 'prop-types'
 import ConfirmModal from './ConfirmModal';
-import SubTodos from './SubTodos';
 import SubTodoModal from './SubTodoModal';
 
 const TodoApp = ({ sUsername }) => {
@@ -86,7 +85,6 @@ const TodoApp = ({ sUsername }) => {
     }
 
     const handleOpenSubTodoModal = (todo) => {
-        console.log('object');
         setOpenTodo(todo)
         setIsSubModalOpen(true)
     }
@@ -94,6 +92,11 @@ const TodoApp = ({ sUsername }) => {
     const handleCloseSubModal = () => {
         setIsSubModalOpen(false)
         setOpenTodo(null)
+        const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
+        const currTodos = todoData.filter((todo) => todo.sUsername === sUsername);
+        setTodos(currTodos)
+        setAllTodos(todoData)
+
     }
 
     return (
@@ -108,29 +111,28 @@ const TodoApp = ({ sUsername }) => {
                             onChange={() =>
                                 handleCheckbox(todo.iId)
                             }
-                            className="mr-2"
+                            className="mr-2 cursor-pointer"
                         />
                         <span
-                            className={`${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                            className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer`}
                             onClick={() => handleOpenSubTodoModal(todo)}
                         >
                             {todo.sTitle}
                         </span>
                         <button
                             type="button"
-                            className="ml-10 text-blue-500 hover:text-blue-600"
+                            className="ml-10 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
                             onClick={() => handleOpenModal(todo)}
                         >
                             Edit
                         </button>
                         <button
                             type="button"
-                            className="ml-10 text-blue-500 hover:text-blue-600"
+                            className="ml-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
                             onClick={() => handleConfirmModal(todo, true)}
                         >
                             Delete
                         </button>
-                        <SubTodos />
                     </li>
                 ))}
             </ul>
@@ -159,7 +161,7 @@ const TodoApp = ({ sUsername }) => {
                 todo={openTodo}
                 allTodos={allTodos}
             />
-        </div>
+        </div >
     );
 };
 

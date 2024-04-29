@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import TodoModal from './TodoModal';
+import { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types'
 import ConfirmModal from './ConfirmModal';
 import SubTodoModal from './SubTodoModal';
@@ -9,11 +8,15 @@ const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
     // eslint-disable-next-line no-unused-vars
     const [allTodos, setAllTodos] = useState([])
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubModalOpen, setIsSubModalOpen] = useState(false);
-    const [editingTodo, setEditingTodo] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [openTodo, setOpenTodo] = useState(null)
+    const [validateMsg, setValidateMsg] = useState('')
+    const [editingId, setEditingId] = useState(null)
+    const [todoNew, setTodoNew] = useState('')
+    const [editTodoText, setEditTodoText] = useState('')
+    const inputRef = useRef(null)
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
@@ -22,10 +25,18 @@ const TodoApp = ({ sUsername }) => {
         setAllTodos(todoData)
     }, [sUsername])
 
-    const handleAddTodo = (text) => {
+    useEffect(() => {
+        if (inputRef.current && editingId !== null) {
+            inputRef.current.focus();
+        }
+    }, [editingId]);
+
+    const handleAddTodo = (e) => {
+        e.preventDefault()
+        if (!todoNew) return setValidateMsg('Please enter a value')
         const iId = uuidv4()
         const newTodo = {
-            sTitle: text,
+            sTitle: todoNew,
             bCompleted: false,
             sUsername,
             iId
@@ -36,42 +47,42 @@ const TodoApp = ({ sUsername }) => {
         localStorage.setItem('todoData', JSON.stringify(updatedTodos));
     };
 
-    const handleUpdateTodo = (text) => {
+    const handleUpdateTodo = () => {
         const newTodos = todos.map((todo) =>
-            todo === editingTodo ? { ...todo, sTitle: text } : todo
+            todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
         );
         const newAllTodos = allTodos.map((todo) =>
-            todo === editingTodo ? { ...todo, sTitle: text } : todo
+            todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
         )
         setTodos(newTodos);
         setAllTodos(newAllTodos);
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
-        setEditingTodo(null);
+        setEditingId(null);
     };
 
     const handleDeleteTodo = () => {
-        const newTodos = todos.filter((todo) => todo !== editingTodo);
-        const newAllTodos = allTodos.filter((todo) => todo !== editingTodo);
+        const newTodos = todos.filter((todo) => todo.iId !== editingId);
+        const newAllTodos = allTodos.filter((todo) => todo.iId !== editingId);
         setTodos(newTodos);
         setAllTodos(newAllTodos);
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
-        setEditingTodo(null);
+        setEditingId(null);
     }
 
-    const handleOpenModal = (todo = null) => {
-        setEditingTodo(todo);
-        setIsModalOpen(true);
-    };
+    // const handleOpenModal = (todo = null) => {
+    //     setEditingTodo(todo);
+    //     setIsModalOpen(true);
+    // };
 
     const handleConfirmModal = (todo = null) => {
-        setEditingTodo(todo);
+        setEditingId(todo.iId);
         setIsConfirmModalOpen(true)
     }
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setEditingTodo(null);
-    };
+    // const handleCloseModal = () => {
+    //     setIsModalOpen(false);
+    //     setEditingTodo(null);
+    // };
 
     const handleCheckbox = (iId) => {
         const newTodos = todos.map((t) =>
@@ -100,30 +111,50 @@ const TodoApp = ({ sUsername }) => {
 
     }
 
+    const handleTodoEdit = (iId, value) => {
+        setEditingId(iId);
+        setEditTodoText(value)
+    }
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo App</h1>
-            <ul>
-                {todos.map((todo, index) => (
-                    <li key={index} className="flex items-center mb-2">
-                        <input
-                            type="checkbox"
-                            checked={todo.bCompleted}
-                            onChange={() =>
-                                handleCheckbox(todo.iId)
-                            }
-                            className="mr-2 cursor-pointer"
-                        />
-                        <span
-                            className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer`}
-                            onClick={() => handleOpenSubTodoModal(todo)}
-                        >
-                            {todo.sTitle}
-                        </span>
+
+            {todos.map((todo, index) => (
+                <div
+                    key={index}
+                    className='flex items-center mb-2'
+                >
+                    <input
+                        type="checkbox"
+                        checked={todo.bCompleted}
+                        onChange={() =>
+                            handleCheckbox(todo.iId)
+                        }
+                        className="mr-2 cursor-pointer"
+                    />
+                    {editingId === todo.iId ? <input
+                        type="text"
+                        ref={inputRef}
+                        value={editTodoText}
+                        onChange={e => setEditTodoText(e.target.value)}
+                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 mb-4 ${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                    /> : <span
+                        className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer`}
+                        onClick={() => handleOpenSubTodoModal(todo)}
+                    >
+                        {todo.sTitle}
+                    </span>}
+                    {editingId === todo.iId ? <button
+                        className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
+                        onClick={() => handleUpdateTodo(todo.iId)}
+                    >
+                        Save
+                    </button> : <>
                         <button
                             type="button"
                             className="ml-10 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                            onClick={() => handleOpenModal(todo)}
+                            onClick={() => handleTodoEdit(todo.iId, todo.sTitle)}
                         >
                             Edit
                         </button>
@@ -134,22 +165,38 @@ const TodoApp = ({ sUsername }) => {
                         >
                             Delete
                         </button>
-                    </li>
-                ))}
-            </ul>
-            <button
-                type="button"
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                onClick={() => handleOpenModal()}
-            >
-                Add Todo
-            </button>
-            <TodoModal
+                    </>}
+                </div>
+
+            ))}
+
+            <form onSubmit={handleAddTodo}>
+                <div className='flex mt-5'>
+                    <input
+                        type="text"
+                        value={todoNew}
+                        onChange={(e) => {
+                            setValidateMsg('')
+                            setTodoNew(e.target.value)
+                        }}
+                        className="mr-3 border border-gray-300 rounded-lg px-4 py-2 mb-4"
+                        placeholder="Enter todo..."
+                    />
+                    <button
+                        type='submit'
+                        className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10"
+                    >
+                        Add
+                    </button>
+                </div>
+                {validateMsg && <p className='text-red-500 text-xs mb-1'>{validateMsg}</p>}
+            </form>
+            {/* <TodoModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSubmit={editingTodo ? handleUpdateTodo : handleAddTodo}
                 initialValue={editingTodo ? editingTodo.sTitle : ''}
-            />
+            /> */}
             <ConfirmModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => setIsConfirmModalOpen(false)}

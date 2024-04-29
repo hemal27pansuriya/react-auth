@@ -163,7 +163,7 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
                                         onChange={() =>
                                             handleSubTodoCheckboxChange(subTodo.iId)
                                         }
-                                        className="mr-2"
+                                        className="mr-2 cursor-pointer"
                                     />
                                     {editingSTId === subTodo.iId ? <input
                                         type="text"
@@ -171,12 +171,11 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
                                         value={subTodoText}
                                         onChange={e => setSubTodoText(e.target.value)}
                                         className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4 ${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}
-                                    /> : <input
-                                        type="text"
-                                        readOnly
-                                        value={subTodo.sTitle}
-                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4 ${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}
-                                    />}
+                                    /> : <span
+                                        className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer`}
+                                    >
+                                        {subTodo.sTitle}
+                                    </span>}
                                     {editingSTId === subTodo.iId ? <button
                                         className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
                                         onClick={() => handleSubTodoSave(subTodo.iId)}

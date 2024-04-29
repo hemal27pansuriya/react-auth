@@ -3,6 +3,7 @@ import TodoModal from './TodoModal';
 import PropTypes from 'prop-types'
 import ConfirmModal from './ConfirmModal';
 import SubTodoModal from './SubTodoModal';
+import { v4 as uuidv4 } from "uuid";
 
 const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
@@ -22,7 +23,7 @@ const TodoApp = ({ sUsername }) => {
     }, [sUsername])
 
     const handleAddTodo = (text) => {
-        const iId = todos.length ? todos.length + 1 : 1;
+        const iId = uuidv4()
         const newTodo = {
             sTitle: text,
             bCompleted: false,

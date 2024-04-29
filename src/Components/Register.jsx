@@ -170,7 +170,7 @@ const Register = () => {
         </form>
         <p className='mt-2 text-center text-sm text-gray-600'>
           Already registered?
-          <a onClick={() => navigate('/register')} className="font-medium text-indigo-600 hover:text-indigo-500">
+          <a onClick={() => navigate('/register')} className="ml-1 font-medium text-indigo-600 hover:text-indigo-500">
             Login Here
           </a>
         </p>

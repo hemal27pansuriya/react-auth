@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import PropTypes from "prop-types";
+import { v4 as uuidv4 } from 'uuid'
 
 const SubTodoModal = ({ isOpen, onClose, todo }) => {
     const [validateMsg, setValidateMsg] = useState('')
@@ -21,9 +22,10 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
         }
     }, [todo])
 
-    const handleAddSubTodo = () => {
+    const handleAddSubTodo = (e) => {
+        e.preventDefault()
         if (!subTodoNew) return setValidateMsg('Please enter a value')
-        const newST = { iId: subTodo?.aSubTodos?.length + 1 || 1, sTitle: subTodoNew, bCompleted: false }
+        const newST = { iId: uuidv4(), sTitle: subTodoNew, bCompleted: false }
         const updatedTodos = allTodos.map((t) => {
             if (t.iId === subTodo.iId) {
                 const aSubTodos = t.aSubTodos || []
@@ -70,7 +72,6 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
     const handleSubTodoEdit = (iId, value) => {
         setEditingSTId(iId);
         setSubTodoText(value)
-        // inputRef.current.focus()
     }
 
     const handleSubTodoSave = (iId) => {

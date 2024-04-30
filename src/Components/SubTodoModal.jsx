@@ -155,7 +155,7 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
                             subTodo.aSubTodos.map((subTodo, i) => (
                                 <div
                                     key={i}
-                                    className='flex'
+                                    className='flex mb-2 items-center'
                                 >
                                     <input
                                         type="checkbox"
@@ -170,9 +170,9 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
                                         ref={inputRef}
                                         value={subTodoText}
                                         onChange={e => setSubTodoText(e.target.value)}
-                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full mb-4 ${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full ${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}
                                     /> : <span
-                                        className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer`}
+                                        className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} w-full mb-4 cursor-pointer`}
                                     >
                                         {subTodo.sTitle}
                                     </span>}

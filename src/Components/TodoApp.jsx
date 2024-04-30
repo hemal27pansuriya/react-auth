@@ -14,9 +14,10 @@ const TodoApp = ({ sUsername }) => {
     const [openTodo, setOpenTodo] = useState(null)
     const [validateMsg, setValidateMsg] = useState('')
     const [editingId, setEditingId] = useState(null)
+    const [deletingId, setDeletingId] = useState(null)
     const [todoNew, setTodoNew] = useState('')
     const [editTodoText, setEditTodoText] = useState('')
-    const inputRef = useRef(null)
+    // const inputRef = useRef(null)
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
@@ -25,11 +26,11 @@ const TodoApp = ({ sUsername }) => {
         setAllTodos(todoData)
     }, [sUsername])
 
-    useEffect(() => {
-        if (inputRef.current && editingId !== null) {
-            inputRef.current.focus();
-        }
-    }, [editingId]);
+    // useEffect(() => {
+    //     if (inputRef.current && editingId !== null) {
+    //         inputRef.current.focus();
+    //     }
+    // }, [editingId]);
 
     const handleAddTodo = (e) => {
         e.preventDefault()
@@ -45,6 +46,7 @@ const TodoApp = ({ sUsername }) => {
         const updatedTodos = [...allTodos, newTodo];
         setAllTodos(updatedTodos)
         localStorage.setItem('todoData', JSON.stringify(updatedTodos));
+        setTodoNew('')
     };
 
     const handleUpdateTodo = () => {
@@ -61,12 +63,12 @@ const TodoApp = ({ sUsername }) => {
     };
 
     const handleDeleteTodo = () => {
-        const newTodos = todos.filter((todo) => todo.iId !== editingId);
-        const newAllTodos = allTodos.filter((todo) => todo.iId !== editingId);
+        const newTodos = todos.filter((todo) => todo.iId !== deletingId);
+        const newAllTodos = allTodos.filter((todo) => todo.iId !== deletingId);
         setTodos(newTodos);
         setAllTodos(newAllTodos);
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
-        setEditingId(null);
+        setDeletingId(null);
     }
 
     // const handleOpenModal = (todo = null) => {
@@ -75,7 +77,7 @@ const TodoApp = ({ sUsername }) => {
     // };
 
     const handleConfirmModal = (todo = null) => {
-        setEditingId(todo.iId);
+        setDeletingId(todo.iId);
         setIsConfirmModalOpen(true)
     }
 
@@ -120,7 +122,7 @@ const TodoApp = ({ sUsername }) => {
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo App</h1>
 
-            {todos.map((todo, index) => (
+            {/* {todos.map((todo, index) => (
                 <div
                     key={index}
                     className='flex items-center mb-2'
@@ -168,7 +170,7 @@ const TodoApp = ({ sUsername }) => {
                     </>}
                 </div>
 
-            ))}
+            ))} */}
 
             <form onSubmit={handleAddTodo}>
                 <div className='flex mt-5'>

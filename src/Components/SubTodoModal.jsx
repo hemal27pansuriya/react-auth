@@ -52,7 +52,7 @@ const SubTodoModal = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                 )
             } : t
         );
-        const newST = newTodos.find(t => t.iId === subTodo.iId && t.sUsername === subTodo.sUsername).aSubTodos
+        const newST = newTodos.find(t => t.iId === subTodo.iId).aSubTodos
         const allChecked = newST.every(st => st.bCompleted)
         newTodos = newTodos.map((t) =>
             t.iId === subTodo.iId ? {
@@ -64,6 +64,7 @@ const SubTodoModal = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
             ...subTodo,
             aSubTodos: newST
         }
+        console.log('object67', curr);
         setSubTodo(curr);
         setAllTodos(newTodos)
         localStorage.setItem('todoData', JSON.stringify(newTodos));
@@ -153,20 +154,20 @@ const SubTodoModal = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                             </button>
                         </div>
                         {subTodo.aSubTodos && subTodo.aSubTodos.length > 0 &&
-                            subTodo.aSubTodos.map((subTodo, i) => (
+                            subTodo.aSubTodos.map((st, i) => (
                                 <div
                                     key={i}
                                     className='flex mb-2 items-center'
                                 >
                                     <input
                                         type="checkbox"
-                                        checked={subTodo.bCompleted}
+                                        checked={st.bCompleted}
                                         onChange={() =>
-                                            handleSubTodoCheckboxChange(subTodo.iId)
+                                            handleSubTodoCheckboxChange(st.iId)
                                         }
                                         className="mr-2 cursor-pointer"
                                     />
-                                    {editingSTId === subTodo.iId ? <input
+                                    {editingSTId === st.iId ? <input
                                         type="text"
                                         ref={inputRef}
                                         value={subTodoText}
@@ -175,17 +176,17 @@ const SubTodoModal = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                                     /> : <span
                                         className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} w-full mb-4 cursor-pointer`}
                                     >
-                                        {subTodo.sTitle}
+                                        {st.sTitle}
                                     </span>}
                                     {editingSTId === subTodo.iId ? <button
                                         className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
-                                        onClick={() => handleSubTodoSave(subTodo.iId)}
+                                        onClick={() => handleSubTodoSave(st.iId)}
                                     >
                                         Save
                                     </button> : <>
                                         <button
                                             className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
-                                            onClick={() => handleSubTodoEdit(subTodo.iId, subTodo.sTitle)}
+                                            onClick={() => handleSubTodoEdit(st.iId, subTodo.sTitle)}
                                         >
                                             Edit
                                         </button>

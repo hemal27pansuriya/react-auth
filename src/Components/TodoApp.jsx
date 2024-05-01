@@ -115,14 +115,6 @@ const TodoApp = ({ sUsername }) => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo App</h1>
-            {/* <TodoList
-                todos={todos}
-                handleCheckbox={handleCheckbox}
-                handleOpenSubTodoModal={handleOpenSubTodoModal}
-                handleUpdateTodo={handleUpdateTodo}
-                handleTodoEdit={handleTodoEdit}
-                handleConfirmModal={handleConfirmModal}
-            /> */}
             <div
                 className='w-1/2 p-5 border border-blue-500 rounded-lg bg-blue-100'
             >
@@ -137,16 +129,16 @@ const TodoApp = ({ sUsername }) => {
                             onChange={() =>
                                 handleCheckbox(todo.iId)
                             }
-                            className="mr-4 cursor-pointer appearance-none h-5 w-7 border border-blue-500 rounded-md checked:bg-blue-600 checked:border-transparent focus:outline-none"
+                            className="mr-4 cursor-pointer appearance-none h-5 w-7 border border-blue-500 bg-white rounded-md checked:bg-green-600 checked:border-transparent focus:outline-none"
                         />
                         {editingId === todo.iId ? <input
                             type="text"
                             ref={inputRef}
                             value={editTodoText}
                             onChange={e => setEditTodoText(e.target.value)}
-                            className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full ${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                            className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full`}
                         /> : <span
-                            className={`bg-blue-200 px-3 py-2 rounded-md p-2 ${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer w-full`}
+                            className={`bg-white px-3 py-2 rounded-md p-2 ${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer w-full`}
                             onClick={() => handleOpenSubTodoModal(todo)}
                         >
                             {todo.sTitle}
@@ -178,7 +170,7 @@ const TodoApp = ({ sUsername }) => {
                 }
             </div >
             <form onSubmit={handleAddTodo}>
-                <div className='flex mt-5'>
+                <div className='flex mt-5 border border-blue-500 bg-blue-100 rounded-lg w-1/2 p-5'>
                     <input
                         type="text"
                         value={todoNew}
@@ -186,7 +178,7 @@ const TodoApp = ({ sUsername }) => {
                             setValidateMsg('')
                             setTodoNew(e.target.value)
                         }}
-                        className="mr-3 border border-gray-300 rounded-lg px-4 py-2 mb-4"
+                        className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full"
                         placeholder="Enter todo..."
                     />
                     <button

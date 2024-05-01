@@ -8,7 +8,6 @@ const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
     // eslint-disable-next-line no-unused-vars
     const [allTodos, setAllTodos] = useState([])
-    // const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubModalOpen, setIsSubModalOpen] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [openTodo, setOpenTodo] = useState(null)
@@ -17,7 +16,7 @@ const TodoApp = ({ sUsername }) => {
     const [deletingId, setDeletingId] = useState(null)
     const [todoNew, setTodoNew] = useState('')
     const [editTodoText, setEditTodoText] = useState('')
-    // const inputRef = useRef(null)
+    const inputRef = useRef(null)
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
@@ -26,11 +25,11 @@ const TodoApp = ({ sUsername }) => {
         setAllTodos(todoData)
     }, [sUsername])
 
-    // useEffect(() => {
-    //     if (inputRef.current && editingId !== null) {
-    //         inputRef.current.focus();
-    //     }
-    // }, [editingId]);
+    useEffect(() => {
+        if (inputRef.current && editingId !== null) {
+            inputRef.current.focus();
+        }
+    }, [editingId]);
 
     const handleAddTodo = (e) => {
         e.preventDefault()
@@ -71,27 +70,19 @@ const TodoApp = ({ sUsername }) => {
         setDeletingId(null);
     }
 
-    // const handleOpenModal = (todo = null) => {
-    //     setEditingTodo(todo);
-    //     setIsModalOpen(true);
-    // };
-
     const handleConfirmModal = (todo = null) => {
         setDeletingId(todo.iId);
         setIsConfirmModalOpen(true)
     }
 
-    // const handleCloseModal = () => {
-    //     setIsModalOpen(false);
-    //     setEditingTodo(null);
-    // };
-
     const handleCheckbox = (iId) => {
         const newTodos = todos.map((t) =>
-            t.iId === iId ? { ...t, bCompleted: !t.bCompleted } : t
+            t.iId === iId ? {
+                ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || []
+            } : t
         );
         const newAllTodos = allTodos.map((t) =>
-            t.iId === iId && t.sUsername === sUsername ? { ...t, bCompleted: !t.bCompleted } : t
+            t.iId === iId ? { ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || [] } : t
         )
         setTodos(newTodos);
         setAllTodos(newAllTodos);
@@ -106,11 +97,14 @@ const TodoApp = ({ sUsername }) => {
     const handleCloseSubModal = () => {
         setIsSubModalOpen(false)
         setOpenTodo(null)
+    }
+
+    const updateOnCheckbox = () => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
         const currTodos = todoData.filter((todo) => todo.sUsername === sUsername);
+        console.log('105-', currTodos)
         setTodos(currTodos)
         setAllTodos(todoData)
-
     }
 
     const handleTodoEdit = (iId, value) => {
@@ -121,57 +115,68 @@ const TodoApp = ({ sUsername }) => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo App</h1>
-
-            {/* {todos.map((todo, index) => (
-                <div
-                    key={index}
-                    className='flex items-center mb-2'
-                >
-                    <input
-                        type="checkbox"
-                        checked={todo.bCompleted}
-                        onChange={() =>
-                            handleCheckbox(todo.iId)
-                        }
-                        className="mr-2 cursor-pointer"
-                    />
-                    {editingId === todo.iId ? <input
-                        type="text"
-                        ref={inputRef}
-                        value={editTodoText}
-                        onChange={e => setEditTodoText(e.target.value)}
-                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 mb-4 ${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
-                    /> : <span
-                        className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer`}
-                        onClick={() => handleOpenSubTodoModal(todo)}
+            {/* <TodoList
+                todos={todos}
+                handleCheckbox={handleCheckbox}
+                handleOpenSubTodoModal={handleOpenSubTodoModal}
+                handleUpdateTodo={handleUpdateTodo}
+                handleTodoEdit={handleTodoEdit}
+                handleConfirmModal={handleConfirmModal}
+            /> */}
+            <div
+                className='w-1/2 p-5 border border-blue-500 rounded-lg bg-blue-100'
+            >
+                {todos.map((todo, index) => (
+                    <div
+                        key={index}
+                        className='flex items-center mb-2'
                     >
-                        {todo.sTitle}
-                    </span>}
-                    {editingId === todo.iId ? <button
-                        className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
-                        onClick={() => handleUpdateTodo(todo.iId)}
-                    >
-                        Save
-                    </button> : <>
-                        <button
-                            type="button"
-                            className="ml-10 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                            onClick={() => handleTodoEdit(todo.iId, todo.sTitle)}
+                        <input
+                            type="checkbox"
+                            checked={todo.bCompleted}
+                            onChange={() =>
+                                handleCheckbox(todo.iId)
+                            }
+                            className="mr-4 cursor-pointer appearance-none h-5 w-7 border border-blue-500 rounded-md checked:bg-blue-600 checked:border-transparent focus:outline-none"
+                        />
+                        {editingId === todo.iId ? <input
+                            type="text"
+                            ref={inputRef}
+                            value={editTodoText}
+                            onChange={e => setEditTodoText(e.target.value)}
+                            className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full ${todo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                        /> : <span
+                            className={`bg-blue-200 px-3 py-2 rounded-md p-2 ${todo.bCompleted ? 'line-through text-gray-500' : ''} cursor-pointer w-full`}
+                            onClick={() => handleOpenSubTodoModal(todo)}
                         >
-                            Edit
-                        </button>
-                        <button
-                            type="button"
-                            className="ml-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                            onClick={() => handleConfirmModal(todo, true)}
+                            {todo.sTitle}
+                        </span>}
+                        {editingId === todo.iId ? <button
+                            className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
+                            onClick={() => handleUpdateTodo(todo.iId)}
                         >
-                            Delete
-                        </button>
-                    </>}
-                </div>
+                            Save
+                        </button> : <>
+                            <button
+                                type="button"
+                                className="ml-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                                onClick={() => handleTodoEdit(todo.iId, todo.sTitle)}
+                            >
+                                Edit
+                            </button>
+                            <button
+                                type="button"
+                                className="ml-3 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                                onClick={() => handleConfirmModal(todo, true)}
+                            >
+                                Delete
+                            </button>
+                        </>}
+                    </div>
 
-            ))} */}
-
+                ))
+                }
+            </div >
             <form onSubmit={handleAddTodo}>
                 <div className='flex mt-5'>
                     <input
@@ -193,12 +198,6 @@ const TodoApp = ({ sUsername }) => {
                 </div>
                 {validateMsg && <p className='text-red-500 text-xs mb-1'>{validateMsg}</p>}
             </form>
-            {/* <TodoModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onSubmit={editingTodo ? handleUpdateTodo : handleAddTodo}
-                initialValue={editingTodo ? editingTodo.sTitle : ''}
-            /> */}
             <ConfirmModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => setIsConfirmModalOpen(false)}
@@ -210,6 +209,7 @@ const TodoApp = ({ sUsername }) => {
                 onClose={handleCloseSubModal}
                 todo={openTodo}
                 allTodos={allTodos}
+                updateOnCheckbox={updateOnCheckbox}
             />
         </div >
     );

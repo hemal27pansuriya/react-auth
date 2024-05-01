@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
-const TodoList = ({ todos, handleCheckbox, handleOpenSubTodoModal, handleUpdateTodo, handleTodoEdit, handleConfirmModal }) => {
+const TodoList = ({ todos, handleCheckbox, handleOpenSubTodoModal, handleUpdateTodo, handleConfirmModal }) => {
     const inputRef = useRef(null)
     const [editingId, setEditingId] = useState(null)
     const [editTodoText, setEditTodoText] = useState('')
@@ -11,6 +11,11 @@ const TodoList = ({ todos, handleCheckbox, handleOpenSubTodoModal, handleUpdateT
             inputRef.current.focus();
         }
     }, [editingId]);
+
+    const handleTodoEdit = (iId, value) => {
+        setEditingId(iId);
+        setEditTodoText(value)
+    }
 
     return (
         <div>

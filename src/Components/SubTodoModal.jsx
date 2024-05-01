@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import PropTypes from "prop-types";
 import { v4 as uuidv4 } from 'uuid'
 
-const SubTodoModal = ({ isOpen, onClose, todo }) => {
+const SubTodoModal = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
     const [validateMsg, setValidateMsg] = useState('')
     const [subTodoText, setSubTodoText] = useState('')
     const [subTodo, setSubTodo] = useState({})
@@ -67,6 +67,7 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
         setSubTodo(curr);
         setAllTodos(newTodos)
         localStorage.setItem('todoData', JSON.stringify(newTodos));
+        updateOnCheckbox()
     };
 
     const handleSubTodoEdit = (iId, value) => {
@@ -230,7 +231,8 @@ const SubTodoModal = ({ isOpen, onClose, todo }) => {
 SubTodoModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    todo: PropTypes.object
+    todo: PropTypes.object,
+    updateOnCheckbox: PropTypes.func.isRequired,
 }
 
 export default SubTodoModal;

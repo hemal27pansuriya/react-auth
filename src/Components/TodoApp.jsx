@@ -4,8 +4,9 @@ import ConfirmModal from './ConfirmModal';
 import { v4 as uuidv4 } from "uuid";
 import IconButton from '@mui/material/IconButton';
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
-import SubTodoDialog from './SubTodoDialog';
 import { Tooltip } from '@mui/material'
+import SubTodos from './SubTodos';
+import SubTodoDialog from './SubTodoDialog';
 
 const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
@@ -116,7 +117,7 @@ const TodoApp = ({ sUsername }) => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 flex">
             <div className='todo-app w-1/2'>
                 <h1 className="text-2xl font-bold mb-4 text-center">Todo App</h1>
                 <form onSubmit={handleAddTodo}>
@@ -219,14 +220,27 @@ const TodoApp = ({ sUsername }) => {
                     onSubmit={handleDeleteTodo}
                     title='Are you sure want to delete?'
                 />
-                <SubTodoDialog
+                {/* <SubTodoDialog
                     isOpen={isSubModalOpen}
                     onClose={handleCloseSubModal}
                     todo={openTodo}
                     allTodos={allTodos}
                     updateOnCheckbox={updateOnCheckbox}
-                />
+                /> */}
             </div >
+            {
+                isSubModalOpen && (
+                    <div className="w-1/2">
+                        <SubTodos
+                            isOpen={isSubModalOpen}
+                            onClose={handleCloseSubModal}
+                            todo={openTodo}
+                            allTodos={allTodos}
+                            updateOnCheckbox={updateOnCheckbox}
+                        />
+                    </div>
+                )
+            }
         </div>
     );
 };

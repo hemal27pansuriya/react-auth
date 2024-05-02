@@ -174,7 +174,7 @@ const SubTodoDialog = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                                         color="primary"
                                     />
                                 }
-                                label={<span className="patrick-hand-regular">{editingSTId !== st.iId ? st.sTitle : ''}</span>}
+                                label={<span className={`patrick-hand-regular ${st.bCompleted ? 'line-through text-gray-700' : ''}`}>{editingSTId !== st.iId ? st.sTitle : ''}</span>}
                             />
                             {editingSTId === st.iId ? (
                                 <TextField

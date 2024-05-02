@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 import ConfirmModal from './ConfirmModal';
 import { v4 as uuidv4 } from "uuid";
 import IconButton from '@mui/material/IconButton';
-import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { Tooltip } from '@mui/material'
 import SubTodos from './SubTodos';
-import SubTodoDialog from './SubTodoDialog';
 
 const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
@@ -61,6 +60,7 @@ const TodoApp = ({ sUsername }) => {
         )
         setTodos(newTodos);
         setAllTodos(newAllTodos);
+        if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
         setEditingId(null);
     };
@@ -70,6 +70,7 @@ const TodoApp = ({ sUsername }) => {
         const newAllTodos = allTodos.filter((todo) => todo.iId !== deletingId);
         setTodos(newTodos);
         setAllTodos(newAllTodos);
+        if (openTodo && openTodo.iId === deletingId) handleCloseSubModal()
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
         setDeletingId(null);
     }
@@ -90,12 +91,13 @@ const TodoApp = ({ sUsername }) => {
         )
         setTodos(newTodos);
         setAllTodos(newAllTodos);
+        if (openTodo && openTodo.iId === iId) setOpenTodo({ ...openTodo, bCompleted: !openTodo.bCompleted })
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
     }
 
     const handleOpenSubTodoModal = (todo) => {
-        setOpenTodo(todo)
-        setIsSubModalOpen(true)
+        setOpenTodo(openTodo ? null : todo)
+        setIsSubModalOpen(openTodo ? false : true)
     }
 
     const handleCloseSubModal = () => {
@@ -121,7 +123,7 @@ const TodoApp = ({ sUsername }) => {
             <div className='todo-app w-1/2'>
                 <h1 className="text-2xl font-bold mb-4 text-center">Todo App</h1>
                 <form onSubmit={handleAddTodo}>
-                    <div className='mb-5 rounded-lg p-5 bg-texture'>
+                    <div className='mb-5 rounded-lg p-5 bg-texture shadow-lg'>
                         <div className='flex'>
                             <input
                                 type="text"
@@ -144,18 +146,13 @@ const TodoApp = ({ sUsername }) => {
                     </div>
                 </form>
                 <div
-                    className='p-5 rounded-lg bg-texture'
+                    className='p-5 rounded-lg bg-texture shadow-lg'
                 >
                     {todos.map((todo, index) => (
                         <div
                             key={index}
                             className={`flex items-center ${index > 0 ? 'mt-2' : ''}`}
                         >
-                            <Tooltip title='Open Sub-Todos'>
-                                <IconButton onClick={() => handleOpenSubTodoModal(todo)}>
-                                    <ArrowDropDown />
-                                </IconButton>
-                            </Tooltip>
                             <input
                                 type="checkbox"
                                 checked={todo.bCompleted}
@@ -204,12 +201,17 @@ const TodoApp = ({ sUsername }) => {
                                 </button>
                                 <button
                                     type="button"
-                                    className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                                    className="ml-3 mr-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                                     onClick={() => handleConfirmModal(todo, true)}
                                 >
                                     Delete
                                 </button>
                             </>}
+                            <Tooltip title='Open Sub-Todos'>
+                                <IconButton onClick={() => handleOpenSubTodoModal(todo)}>
+                                    {openTodo && openTodo.iId === todo.iId ? <ArrowRight /> : <ArrowDropDown />}
+                                </IconButton>
+                            </Tooltip>
                         </div>
                     ))
                     }
@@ -220,17 +222,10 @@ const TodoApp = ({ sUsername }) => {
                     onSubmit={handleDeleteTodo}
                     title='Are you sure want to delete?'
                 />
-                {/* <SubTodoDialog
-                    isOpen={isSubModalOpen}
-                    onClose={handleCloseSubModal}
-                    todo={openTodo}
-                    allTodos={allTodos}
-                    updateOnCheckbox={updateOnCheckbox}
-                /> */}
             </div >
             {
                 isSubModalOpen && (
-                    <div className="w-1/2">
+                    <div className="w-1/2 pl-5">
                         <SubTodos
                             isOpen={isSubModalOpen}
                             onClose={handleCloseSubModal}

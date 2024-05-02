@@ -21,7 +21,7 @@ const ConfirmModal = ({ isOpen, onClose, onSubmit, title }) => {
                             <div className="flex justify-end">
                                 <button
                                     onClick={onClose}
-                                    className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
+                                    className="bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700"
                                 >
                                     Cancel
                                 </button>

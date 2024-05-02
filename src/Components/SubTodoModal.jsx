@@ -172,13 +172,13 @@ const SubTodoModal = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                                         ref={inputRef}
                                         value={subTodoText}
                                         onChange={e => setSubTodoText(e.target.value)}
-                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full ${subTodo.bCompleted ? 'line-through text-gray-500' : ''}`}
+                                        className={`mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full`}
                                     /> : <span
-                                        className={`${todo.bCompleted ? 'line-through text-gray-500' : ''} w-full mb-4 cursor-pointer`}
+                                        className={`${st.bCompleted ? 'line-through text-gray-500' : ''} w-full mb-4 cursor-pointer`}
                                     >
                                         {st.sTitle}
                                     </span>}
-                                    {editingSTId === subTodo.iId ? <button
+                                    {editingSTId === st.iId ? <button
                                         className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
                                         onClick={() => handleSubTodoSave(st.iId)}
                                     >
@@ -186,13 +186,13 @@ const SubTodoModal = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                                     </button> : <>
                                         <button
                                             className='bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
-                                            onClick={() => handleSubTodoEdit(st.iId, subTodo.sTitle)}
+                                            onClick={() => handleSubTodoEdit(st.iId, st.sTitle)}
                                         >
                                             Edit
                                         </button>
                                         <button
                                             className='ml-2 bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 h-10'
-                                            onClick={() => handleSubTodoDelete(subTodo.iId)}
+                                            onClick={() => handleSubTodoDelete(st.iId)}
                                         >
                                             Delete
                                         </button>

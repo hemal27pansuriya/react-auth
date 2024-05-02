@@ -117,115 +117,117 @@ const TodoApp = ({ sUsername }) => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Todo App</h1>
-            <form onSubmit={handleAddTodo}>
-                <div className='mb-5 rounded-lg w-1/2 p-5 bg-texture'>
-                    <div className='flex'>
-                        <input
-                            type="text"
-                            value={todoNew}
-                            onChange={(e) => {
-                                setValidateMsg('')
-                                setTodoNew(e.target.value)
-                            }}
-                            className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full patrick-hand-regular h-10"
-                            placeholder="Enter todo..."
-                        />
-                        <button
-                            type='submit'
-                            className="bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-800 h-10"
-                        >
-                            Add
-                        </button>
+            <div className='todo-app w-1/2'>
+                <h1 className="text-2xl font-bold mb-4 text-center">Todo App</h1>
+                <form onSubmit={handleAddTodo}>
+                    <div className='mb-5 rounded-lg p-5 bg-texture'>
+                        <div className='flex'>
+                            <input
+                                type="text"
+                                value={todoNew}
+                                onChange={(e) => {
+                                    setValidateMsg('')
+                                    setTodoNew(e.target.value)
+                                }}
+                                className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full patrick-hand-regular h-10"
+                                placeholder="Enter todo..."
+                            />
+                            <button
+                                type='submit'
+                                className="bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-800 h-10"
+                            >
+                                Add
+                            </button>
+                        </div>
+                        {validateMsg && <p className='text-red-600 font-semibold text-xs mt-2'>{validateMsg}</p>}
                     </div>
-                    {validateMsg && <p className='text-red-600 font-semibold text-xs mt-2'>{validateMsg}</p>}
-                </div>
-            </form>
-            <div
-                className='w-1/2 p-5 rounded-lg bg-texture'
-            >
-                {todos.map((todo, index) => (
-                    <div
-                        key={index}
-                        className={`flex items-center ${index > 0 ? 'mt-2' : ''}`}
-                    >
-                        <Tooltip title='Open Sub-Todos'>
-                            <IconButton onClick={() => handleOpenSubTodoModal(todo)}>
-                                <ArrowDropDown />
-                            </IconButton>
-                        </Tooltip>
-                        <input
-                            type="checkbox"
-                            checked={todo.bCompleted}
-                            onChange={() =>
-                                handleCheckbox(todo.iId)
-                            }
-                            className="mr-4 h-5 w-7 cursor-pointer appearance-none checkbox bg-white rounded-md checked:bg-yellow-900 checked:border-transparent focus:outline-none"
-                        />
-                        {editingId === todo.iId ? <input
-                            type="text"
-                            ref={inputRef}
-                            value={editTodoText}
-                            onChange={e => setEditTodoText(e.target.value)}
-                            className={`box-border mr-3 mt-4 border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full patrick-hand-regular h-10`}
-                        /> : (
-                            <span
-                                className={`px-3 py-2 rounded-md p-2 ${todo.bCompleted ? 'line-through text-gray-700' : ''} patrick-hand-regular cursor-pointer w-full`}
-                                onClick={() =>
+                </form>
+                <div
+                    className='p-5 rounded-lg bg-texture'
+                >
+                    {todos.map((todo, index) => (
+                        <div
+                            key={index}
+                            className={`flex items-center ${index > 0 ? 'mt-2' : ''}`}
+                        >
+                            <Tooltip title='Open Sub-Todos'>
+                                <IconButton onClick={() => handleOpenSubTodoModal(todo)}>
+                                    <ArrowDropDown />
+                                </IconButton>
+                            </Tooltip>
+                            <input
+                                type="checkbox"
+                                checked={todo.bCompleted}
+                                onChange={() =>
                                     handleCheckbox(todo.iId)
                                 }
-                            >
-                                {todo.sTitle}
-                            </span>
-                        )}
-                        {editingId === todo.iId ? <>
-                            <button
-                                className='bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700'
-                                onClick={() => handleUpdateTodo(todo.iId)}
-                            >
-                                Save
-                            </button>
-                            <button
-                                type="button"
-                                className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                onClick={() => handleConfirmModal(todo, true)}
-                            >
-                                Delete
-                            </button>
-                        </> : <>
-                            <button
-                                type="button"
-                                className="ml-5 bg-yellow-900 text-white px-4 py-2 rounded-lg hover:bg-yellow-700"
-                                onClick={() => handleTodoEdit(todo.iId, todo.sTitle)}
-                            >
-                                Edit
-                            </button>
-                            <button
-                                type="button"
-                                className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                onClick={() => handleConfirmModal(todo, true)}
-                            >
-                                Delete
-                            </button>
-                        </>}
-                    </div>
-                ))
-                }
+                                className="mr-4 h-5 w-7 cursor-pointer appearance-none checkbox bg-white rounded-md checked:bg-yellow-900 checked:border-transparent focus:outline-none"
+                            />
+                            {editingId === todo.iId ? <input
+                                type="text"
+                                ref={inputRef}
+                                value={editTodoText}
+                                onChange={e => setEditTodoText(e.target.value)}
+                                className={`box-border mr-3 mt-4 border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full patrick-hand-regular h-10`}
+                            /> : (
+                                <span
+                                    className={`px-3 py-2 rounded-md p-2 ${todo.bCompleted ? 'line-through text-gray-700' : ''} patrick-hand-regular cursor-pointer w-full`}
+                                    onClick={() =>
+                                        handleCheckbox(todo.iId)
+                                    }
+                                >
+                                    {todo.sTitle}
+                                </span>
+                            )}
+                            {editingId === todo.iId ? <>
+                                <button
+                                    className='bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700'
+                                    onClick={() => handleUpdateTodo(todo.iId)}
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    type="button"
+                                    className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                                    onClick={() => handleConfirmModal(todo, true)}
+                                >
+                                    Delete
+                                </button>
+                            </> : <>
+                                <button
+                                    type="button"
+                                    className="ml-5 bg-yellow-900 text-white px-4 py-2 rounded-lg hover:bg-yellow-700"
+                                    onClick={() => handleTodoEdit(todo.iId, todo.sTitle)}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    type="button"
+                                    className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                                    onClick={() => handleConfirmModal(todo, true)}
+                                >
+                                    Delete
+                                </button>
+                            </>}
+                        </div>
+                    ))
+                    }
+                </div >
+                <ConfirmModal
+                    isOpen={isConfirmModalOpen}
+                    onClose={() => setIsConfirmModalOpen(false)}
+                    onSubmit={handleDeleteTodo}
+                    title='Are you sure want to delete?'
+                />
+                <SubTodoDialog
+                    isOpen={isSubModalOpen}
+                    onClose={handleCloseSubModal}
+                    todo={openTodo}
+                    allTodos={allTodos}
+                    updateOnCheckbox={updateOnCheckbox}
+                />
             </div >
-            <ConfirmModal
-                isOpen={isConfirmModalOpen}
-                onClose={() => setIsConfirmModalOpen(false)}
-                onSubmit={handleDeleteTodo}
-                title='Are you sure want to delete?'
-            />
-            <SubTodoDialog
-                isOpen={isSubModalOpen}
-                onClose={handleCloseSubModal}
-                todo={openTodo}
-                allTodos={allTodos}
-                updateOnCheckbox={updateOnCheckbox}
-            />
-        </div >
+        </div>
     );
 };
 

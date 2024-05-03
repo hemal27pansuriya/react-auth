@@ -175,6 +175,7 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                                 <SingleTodo
                                     todo={st}
                                     isSub={true}
+                                    updateOnCheckbox={updateOnCheckbox}
                                 />
                             </Fragment>
                             {/* <div

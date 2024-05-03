@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { Tooltip } from '@mui/material'
 
-const SingleTodo = ({ todo, isSub, handleConfirmModal, setIsSubModalOpen, key, openTodo, setOpenTodo }) => {
+const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSubModalOpen, key, openTodo, setOpenTodo }) => {
     const inputRef = useRef(null)
     const [editingId, setEditingId] = useState(null)
     const [editTodoText, setEditTodoText] = useState('')
@@ -29,16 +29,33 @@ const SingleTodo = ({ todo, isSub, handleConfirmModal, setIsSubModalOpen, key, o
     }, [todo])
 
     const handleUpdateTodo = () => {
-        const newTodo = { ...singleTodo, sTitle: editTodoText }
-
-        const newAllTodos = allTodos.map((todo) =>
-            todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
-        )
-        setSingleTodo(newTodo);
-        setAllTodos(newAllTodos);
-        if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
+        let newTodo, newAllTodos
+        if (isSub) {
+            newAllTodos = allTodos.map((t) =>
+                t.iId === singleTodo.iId ? {
+                    ...t,
+                    aSubTodos: t.aSubTodos.map((st) =>
+                        st.iId === editingId ? { ...st, sTitle: editTodoText } : st
+                    )
+                } : t
+            );
+            newTodo = {
+                ...singleTodo,
+                aSubTodos: newAllTodos.find(t => t.iId === singleTodo.iId).aSubTodos
+            }
+            setEditTodoText('')
+            updateOnCheckbox()
+        } else {
+            newTodo = { ...singleTodo, sTitle: editTodoText }
+            newAllTodos = allTodos.map((todo) =>
+                todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
+            )
+            if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
+        }
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
         setEditingId(null);
+        setSingleTodo(newTodo);
+        setAllTodos(newAllTodos);
     };
 
     const handleCheckbox = (iId) => {
@@ -60,7 +77,7 @@ const SingleTodo = ({ todo, isSub, handleConfirmModal, setIsSubModalOpen, key, o
                     bCompleted: allChecked
                 } : t
             );
-            const curr = {
+            newTodo = {
                 ...singleTodo,
                 aSubTodos: newST
             }
@@ -91,6 +108,31 @@ const SingleTodo = ({ todo, isSub, handleConfirmModal, setIsSubModalOpen, key, o
     const handleTodoEdit = (iId, value) => {
         setEditingId(iId);
         setEditTodoText(value)
+    }
+
+    const handleSubTodoDelete = (iId) => {
+        let newTodos = allTodos.map((t) =>
+            t.iId === singleTodo.iId ? {
+                ...t,
+                aSubTodos: t.aSubTodos.filter(st => st.iId !== iId)
+            } : t
+        );
+        const newST = newTodos.find(t => t.iId === singleTodo.iId).aSubTodos
+        const allChecked = newST.every(st => st.bCompleted)
+        newTodos = newTodos.map((t) =>
+            t.iId === singleTodo.iId ? {
+                ...t,
+                bCompleted: allChecked
+            } : t
+        );
+        const curr = {
+            ...singleTodo,
+            aSubTodos: newST
+        }
+        setSubTodo(curr)
+        setAllTodos(newTodos)
+        localStorage.setItem('todoData', JSON.stringify(newTodos));
+        updateOnCheckbox()
     }
 
     return (
@@ -130,7 +172,10 @@ const SingleTodo = ({ todo, isSub, handleConfirmModal, setIsSubModalOpen, key, o
                     <button
                         type="button"
                         className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                        onClick={() => handleConfirmModal(singleTodo, true)}
+                        onClick={() => {
+                            if (isSub) handleSubTodoDelete()
+                            else handleConfirmModal(singleTodo, true)
+                        }}
                     >
                         Delete
                     </button>
@@ -175,7 +220,8 @@ SingleTodo.propTypes = {
     setIsSubModalOpen: PropTypes.func,
     key: PropTypes.number,
     openTodo: PropTypes.object,
-    setOpenTodo: PropTypes.func
+    setOpenTodo: PropTypes.func,
+    updateOnCheckbox: PropTypes.func
 }
 
 export default SingleTodo

@@ -12,7 +12,7 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
     const [editingSTId, setEditingSTId] = useState(null)
     const [allTodos, setAllTodos] = useState(null)
     const inputRef = useRef(null)
-
+    console.log('object sub todos -----')
     useEffect(() => {
         if (todo) {
             const latestTodos = JSON.parse(localStorage.getItem('todoData'))
@@ -22,6 +22,8 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
             })
             setAllTodos(latestTodos)
         }
+        setSubTodoNew('')
+        setEditingSTId(null)
     }, [todo])
 
     const handleAddSubTodo = (e) => {
@@ -166,9 +168,16 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                 <div
                     className='px-6 py-4 bg-white shadow-lg rounded-b-lg'
                 >
+                    {subTodo.aSubTodos && subTodo.aSubTodos.length <= 0 && <p className='text-center font-medium'>No sub todos found</p>}
                     {subTodo.aSubTodos && subTodo.aSubTodos.length > 0 &&
                         subTodo.aSubTodos.map((st, index) => (
-                            <div
+                            <Fragment key={index}>
+                                <SingleTodo
+                                    todo={st}
+                                    isSub={true}
+                                />
+                            </Fragment>
+                            {/* <div
                                 key={index}
                                 className={`flex items-center ${index > 0 ? 'mt-2' : ''}`}
                             >
@@ -226,7 +235,7 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                                         Delete
                                     </button>
                                 </>}
-                            </div>
+                            </div> */}
                         ))
                     }
                     {(subTodo.aSubTodos && subTodo.aSubTodos.length < 3 || !subTodo.aSubTodos) &&

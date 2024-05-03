@@ -1,11 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import PropTypes from 'prop-types'
 import ConfirmModal from './ConfirmModal';
 import { v4 as uuidv4 } from "uuid";
-import IconButton from '@mui/material/IconButton';
-import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
-import { Tooltip } from '@mui/material'
 import SubTodos from './SubTodos';
+import SingleTodo from './SingleTodo';
 
 const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
@@ -15,11 +13,11 @@ const TodoApp = ({ sUsername }) => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [openTodo, setOpenTodo] = useState(null)
     const [validateMsg, setValidateMsg] = useState('')
-    const [editingId, setEditingId] = useState(null)
+    // const [editingId, setEditingId] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
     const [todoNew, setTodoNew] = useState('')
-    const [editTodoText, setEditTodoText] = useState('')
-    const inputRef = useRef(null)
+    // const [editTodoText, setEditTodoText] = useState('')
+    // const inputRef = useRef(null)
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
@@ -28,11 +26,11 @@ const TodoApp = ({ sUsername }) => {
         setAllTodos(todoData)
     }, [sUsername])
 
-    useEffect(() => {
-        if (inputRef.current && editingId !== null) {
-            inputRef.current.focus();
-        }
-    }, [editingId]);
+    // useEffect(() => {
+    //     if (inputRef.current && editingId !== null) {
+    //         inputRef.current.focus();
+    //     }
+    // }, [editingId]);
 
     const handleAddTodo = (e) => {
         e.preventDefault()
@@ -51,19 +49,19 @@ const TodoApp = ({ sUsername }) => {
         setTodoNew('')
     };
 
-    const handleUpdateTodo = () => {
-        const newTodos = todos.map((todo) =>
-            todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
-        );
-        const newAllTodos = allTodos.map((todo) =>
-            todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
-        )
-        setTodos(newTodos);
-        setAllTodos(newAllTodos);
-        if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
-        localStorage.setItem('todoData', JSON.stringify(newAllTodos))
-        setEditingId(null);
-    };
+    // const handleUpdateTodo = () => {
+    //     const newTodos = todos.map((todo) =>
+    //         todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
+    //     );
+    //     const newAllTodos = allTodos.map((todo) =>
+    //         todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
+    //     )
+    //     setTodos(newTodos);
+    //     setAllTodos(newAllTodos);
+    //     if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
+    //     localStorage.setItem('todoData', JSON.stringify(newAllTodos))
+    //     setEditingId(null);
+    // };
 
     const handleDeleteTodo = () => {
         const newTodos = todos.filter((todo) => todo.iId !== deletingId);
@@ -80,25 +78,30 @@ const TodoApp = ({ sUsername }) => {
         setIsConfirmModalOpen(true)
     }
 
-    const handleCheckbox = (iId) => {
-        const newTodos = todos.map((t) =>
-            t.iId === iId ? {
-                ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || []
-            } : t
-        );
-        const newAllTodos = allTodos.map((t) =>
-            t.iId === iId ? { ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || [] } : t
-        )
-        setTodos(newTodos);
-        setAllTodos(newAllTodos);
-        if (openTodo && openTodo.iId === iId) setOpenTodo({ ...openTodo, bCompleted: !openTodo.bCompleted })
-        localStorage.setItem('todoData', JSON.stringify(newAllTodos))
-    }
+    // const handleCheckbox = (iId) => {
+    //     const newTodos = todos.map((t) =>
+    //         t.iId === iId ? {
+    //             ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || []
+    //         } : t
+    //     );
+    //     const newAllTodos = allTodos.map((t) =>
+    //         t.iId === iId ? { ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || [] } : t
+    //     )
+    //     setTodos(newTodos);
+    //     setAllTodos(newAllTodos);
+    //     if (openTodo && openTodo.iId === iId) setOpenTodo({ ...openTodo, bCompleted: !openTodo.bCompleted })
+    //     localStorage.setItem('todoData', JSON.stringify(newAllTodos))
+    // }
 
-    const handleOpenSubTodoModal = (todo) => {
-        setOpenTodo(openTodo ? null : todo)
-        setIsSubModalOpen(openTodo ? false : true)
-    }
+    // const handleOpenSubTodoModal = (todo) => {
+    //     if (todo.iId === openTodo?.iId) {
+    //         setOpenTodo(openTodo ? null : todo)
+    //         setIsSubModalOpen(openTodo ? false : true)
+    //     } else {
+    //         setOpenTodo(todo)
+    //         setIsSubModalOpen(true)
+    //     }
+    // }
 
     const handleCloseSubModal = () => {
         setIsSubModalOpen(false)
@@ -113,10 +116,10 @@ const TodoApp = ({ sUsername }) => {
         setAllTodos(todoData)
     }
 
-    const handleTodoEdit = (iId, value) => {
-        setEditingId(iId);
-        setEditTodoText(value)
-    }
+    // const handleTodoEdit = (iId, value) => {
+    //     setEditingId(iId);
+    //     setEditTodoText(value)
+    // }
 
     return (
         <div className="container mx-auto p-4 flex">
@@ -148,71 +151,19 @@ const TodoApp = ({ sUsername }) => {
                 <div
                     className='p-5 rounded-lg bg-texture shadow-lg'
                 >
-                    {todos.map((todo, index) => (
-                        <div
-                            key={index}
-                            className={`flex items-center ${index > 0 ? 'mt-2' : ''}`}
-                        >
-                            <input
-                                type="checkbox"
-                                checked={todo.bCompleted}
-                                onChange={() =>
-                                    handleCheckbox(todo.iId)
-                                }
-                                className="mr-4 h-5 w-7 cursor-pointer appearance-none checkbox bg-white rounded-md checked:bg-yellow-900 checked:border-transparent focus:outline-none"
+                    {todos.length <= 0 && <p className='text-center font-medium'>No todos found</p>}
+                    {todos.length > 0 && todos.map((todo, index) => (
+                        <Fragment key={index}>
+                            <SingleTodo
+                                todo={todo}
+                                todos={todos}
+                                handleConfirmModal={handleConfirmModal}
+                                isSub={false}
+                                setOpenTodo={setOpenTodo}
+                                openTodo={openTodo}
+                                setIsSubModalOpen={setIsSubModalOpen}
                             />
-                            {editingId === todo.iId ? <input
-                                type="text"
-                                ref={inputRef}
-                                value={editTodoText}
-                                onChange={e => setEditTodoText(e.target.value)}
-                                className={`box-border mr-3 mt-4 border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full patrick-hand-regular h-10`}
-                            /> : (
-                                <span
-                                    className={`px-3 py-2 rounded-md p-2 ${todo.bCompleted ? 'line-through text-gray-700' : ''} patrick-hand-regular cursor-pointer w-full`}
-                                    onClick={() =>
-                                        handleCheckbox(todo.iId)
-                                    }
-                                >
-                                    {todo.sTitle}
-                                </span>
-                            )}
-                            {editingId === todo.iId ? <>
-                                <button
-                                    className='bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700'
-                                    onClick={() => handleUpdateTodo(todo.iId)}
-                                >
-                                    Save
-                                </button>
-                                <button
-                                    type="button"
-                                    className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                    onClick={() => handleConfirmModal(todo, true)}
-                                >
-                                    Delete
-                                </button>
-                            </> : <>
-                                <button
-                                    type="button"
-                                    className="ml-5 bg-yellow-900 text-white px-4 py-2 rounded-lg hover:bg-yellow-700"
-                                    onClick={() => handleTodoEdit(todo.iId, todo.sTitle)}
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    type="button"
-                                    className="ml-3 mr-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                    onClick={() => handleConfirmModal(todo, true)}
-                                >
-                                    Delete
-                                </button>
-                            </>}
-                            <Tooltip title='Open Sub-Todos'>
-                                <IconButton onClick={() => handleOpenSubTodoModal(todo)}>
-                                    {openTodo && openTodo.iId === todo.iId ? <ArrowRight /> : <ArrowDropDown />}
-                                </IconButton>
-                            </Tooltip>
-                        </div>
+                        </Fragment>
                     ))
                     }
                 </div >

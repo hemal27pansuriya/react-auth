@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { Tooltip } from '@mui/material'
 
-const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSubModalOpen, key, openTodo, setOpenTodo }) => {
+const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleConfirmModal, setIsSubModalOpen, key, openTodo, setOpenTodo }) => {
     const inputRef = useRef(null)
     const [editingId, setEditingId] = useState(null)
     const [editTodoText, setEditTodoText] = useState('')
@@ -20,13 +20,32 @@ const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSu
     useEffect(() => {
         if (todo) {
             const latestTodos = JSON.parse(localStorage.getItem('todoData'))
-            const latestSingleTodo = latestTodos.find(t => t.iId === todo.iId)
-            setSingleTodo({
-                ...latestSingleTodo
-            })
+            let latestSingleTodo
+            if (isSub) {
+                latestSingleTodo = latestTodos.find(t => t.iId === mainTodoId)
+                latestSingleTodo = latestSingleTodo.aSubTodos.find(st => st.iId === todo.iId)
+            } else {
+                latestSingleTodo = latestTodos.find(t => t.iId === todo.iId)
+            }
+            setSingleTodo(latestSingleTodo)
             setAllTodos(latestTodos)
+            console.log('object: ', latestSingleTodo, latestTodos);
         }
-    }, [todo])
+    }, [todo, todos])
+
+    // useEffect(() => {
+    //         const latestTodos = JSON.parse(localStorage.getItem('todoData'))
+    //         let latestSingleTodo
+    //         if (isSub) {
+    //             latestSingleTodo = latestTodos.find(t => t.iId === mainTodoId)
+    //             latestSingleTodo = latestSingleTodo.aSubTodos.find(st => st.iId === todo.iId)
+    //         } else {
+    //             latestSingleTodo = latestTodos.find(t => t.iId === todo.iId)
+    //         }
+    //         setSingleTodo(latestSingleTodo)
+    //         setAllTodos(latestTodos)
+    //         console.log('object: ', latestSingleTodo, latestTodos);
+    // }, [allTodos])
 
     const handleUpdateTodo = () => {
         let newTodo, newAllTodos
@@ -46,16 +65,18 @@ const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSu
             setEditTodoText('')
             updateOnCheckbox()
         } else {
-            newTodo = { ...singleTodo, sTitle: editTodoText }
             newAllTodos = allTodos.map((todo) =>
                 todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
             )
+            newTodo = newAllTodos.find((t) => t.iId === editingId);
             if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
+            console.log('object123--------------------------------', newAllTodos, singleTodo);
         }
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
         setEditingId(null);
         setSingleTodo(newTodo);
         setAllTodos(newAllTodos);
+        console.log('object34dd,', allTodos);
     };
 
     const handleCheckbox = (iId) => {
@@ -81,6 +102,7 @@ const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSu
                 ...singleTodo,
                 aSubTodos: newST
             }
+            updateOnCheckbox()
         } else {
             newTodo = {
                 ...singleTodo, bCompleted: !singleTodo.bCompleted, aSubTodos: singleTodo?.aSubTodos?.map(st => { return { ...st, bCompleted: !singleTodo.bCompleted } }) || []
@@ -110,11 +132,11 @@ const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSu
         setEditTodoText(value)
     }
 
-    const handleSubTodoDelete = (iId) => {
+    const handleSubTodoDelete = () => {
         let newTodos = allTodos.map((t) =>
             t.iId === singleTodo.iId ? {
                 ...t,
-                aSubTodos: t.aSubTodos.filter(st => st.iId !== iId)
+                aSubTodos: t.aSubTodos.filter(st => st.iId !== singleTodo.iId)
             } : t
         );
         const newST = newTodos.find(t => t.iId === singleTodo.iId).aSubTodos
@@ -129,7 +151,7 @@ const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSu
             ...singleTodo,
             aSubTodos: newST
         }
-        setSubTodo(curr)
+        setSingleTodo(curr)
         setAllTodos(newTodos)
         localStorage.setItem('todoData', JSON.stringify(newTodos));
         updateOnCheckbox()
@@ -198,8 +220,11 @@ const SingleTodo = ({ todo, isSub, updateOnCheckbox, handleConfirmModal, setIsSu
                 </button>
                 <button
                     type="button"
-                    className="ml-3 mr-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                    onClick={() => handleConfirmModal(singleTodo, true)}
+                    className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                    onClick={() => {
+                        if (isSub) handleSubTodoDelete()
+                        else handleConfirmModal(singleTodo, true)
+                    }}
                 >
                     Delete
                 </button>
@@ -221,7 +246,9 @@ SingleTodo.propTypes = {
     key: PropTypes.number,
     openTodo: PropTypes.object,
     setOpenTodo: PropTypes.func,
-    updateOnCheckbox: PropTypes.func
+    updateOnCheckbox: PropTypes.func,
+    mainTodoId: PropTypes.string,
+    todos: PropTypes.array
 }
 
 export default SingleTodo

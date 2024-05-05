@@ -1,12 +1,13 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Fragment } from 'react';
 import PropTypes from "prop-types";
 import { v4 as uuidv4 } from 'uuid';
 import CloseIcon from '@mui/icons-material/Close';
 import { TextField, IconButton, Box } from "@mui/material";
+import SingleTodo from './SingleTodo';
 
 const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
     const [validateMsg, setValidateMsg] = useState('')
-    const [subTodoText, setSubTodoText] = useState('')
+    // const [subTodoText, setSubTodoText] = useState('')
     const [subTodo, setSubTodo] = useState({})
     const [subTodoNew, setSubTodoNew] = useState('')
     const [editingSTId, setEditingSTId] = useState(null)
@@ -61,83 +62,83 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
         updateOnCheckbox()
     }
 
-    const handleSubTodoCheckboxChange = (iId) => {
-        let newTodos = allTodos.map((t) =>
-            t.iId === subTodo.iId ? {
-                ...t,
-                aSubTodos: t.aSubTodos.map((st) =>
-                    st.iId === iId ? { ...st, bCompleted: !st.bCompleted } : st
-                )
-            } : t
-        );
-        const newST = newTodos.find(t => t.iId === subTodo.iId).aSubTodos
-        const allChecked = newST.every(st => st.bCompleted)
-        newTodos = newTodos.map((t) =>
-            t.iId === subTodo.iId ? {
-                ...t,
-                bCompleted: allChecked
-            } : t
-        );
-        const curr = {
-            ...subTodo,
-            aSubTodos: newST
-        }
-        setSubTodo(curr);
-        setAllTodos(newTodos)
-        localStorage.setItem('todoData', JSON.stringify(newTodos));
-        updateOnCheckbox()
-    };
+    // const handleSubTodoCheckboxChange = (iId) => {
+    //     let newTodos = allTodos.map((t) =>
+    //         t.iId === subTodo.iId ? {
+    //             ...t,
+    //             aSubTodos: t.aSubTodos.map((st) =>
+    //                 st.iId === iId ? { ...st, bCompleted: !st.bCompleted } : st
+    //             )
+    //         } : t
+    //     );
+    //     const newST = newTodos.find(t => t.iId === subTodo.iId).aSubTodos
+    //     const allChecked = newST.every(st => st.bCompleted)
+    //     newTodos = newTodos.map((t) =>
+    //         t.iId === subTodo.iId ? {
+    //             ...t,
+    //             bCompleted: allChecked
+    //         } : t
+    //     );
+    //     const curr = {
+    //         ...subTodo,
+    //         aSubTodos: newST
+    //     }
+    //     setSubTodo(curr);
+    //     setAllTodos(newTodos)
+    //     localStorage.setItem('todoData', JSON.stringify(newTodos));
+    //     updateOnCheckbox()
+    // };
 
-    const handleSubTodoEdit = (iId, value) => {
-        setEditingSTId(iId);
-        setSubTodoText(value)
-    }
+    // const handleSubTodoEdit = (iId, value) => {
+    //     setEditingSTId(iId);
+    //     setSubTodoText(value)
+    // }
 
-    const handleSubTodoSave = (iId) => {
-        const newTodos = allTodos.map((t) =>
-            t.iId === subTodo.iId ? {
-                ...t,
-                aSubTodos: t.aSubTodos.map((st) =>
-                    st.iId === iId ? { ...st, sTitle: subTodoText } : st
-                )
-            } : t
-        );
-        const curr = {
-            ...subTodo,
-            aSubTodos: newTodos.find(t => t.iId === subTodo.iId).aSubTodos
-        }
-        setSubTodo(curr);
-        setAllTodos(newTodos)
-        setEditingSTId(null)
-        setSubTodoText('')
-        localStorage.setItem('todoData', JSON.stringify(newTodos));
-        updateOnCheckbox()
-    }
+    // const handleSubTodoSave = (iId) => {
+    //     const newTodos = allTodos.map((t) =>
+    //         t.iId === subTodo.iId ? {
+    //             ...t,
+    //             aSubTodos: t.aSubTodos.map((st) =>
+    //                 st.iId === iId ? { ...st, sTitle: subTodoText } : st
+    //             )
+    //         } : t
+    //     );
+    //     const curr = {
+    //         ...subTodo,
+    //         aSubTodos: newTodos.find(t => t.iId === subTodo.iId).aSubTodos
+    //     }
+    //     setSubTodo(curr);
+    //     setAllTodos(newTodos)
+    //     setEditingSTId(null)
+    //     setSubTodoText('')
+    //     localStorage.setItem('todoData', JSON.stringify(newTodos));
+    //     updateOnCheckbox()
+    // }
 
-    const handleSubTodoDelete = (iId) => {
-        let newTodos = allTodos.map((t) =>
-            t.iId === subTodo.iId ? {
-                ...t,
-                aSubTodos: t.aSubTodos.filter(st => st.iId !== iId)
-            } : t
-        );
-        const newST = newTodos.find(t => t.iId === subTodo.iId).aSubTodos
-        const allChecked = newST.every(st => st.bCompleted)
-        newTodos = newTodos.map((t) =>
-            t.iId === subTodo.iId ? {
-                ...t,
-                bCompleted: allChecked
-            } : t
-        );
-        const curr = {
-            ...subTodo,
-            aSubTodos: newST
-        }
-        setSubTodo(curr)
-        setAllTodos(newTodos)
-        localStorage.setItem('todoData', JSON.stringify(newTodos));
-        updateOnCheckbox()
-    }
+    // const handleSubTodoDelete = (iId) => {
+    //     let newTodos = allTodos.map((t) =>
+    //         t.iId === subTodo.iId ? {
+    //             ...t,
+    //             aSubTodos: t.aSubTodos.filter(st => st.iId !== iId)
+    //         } : t
+    //     );
+    //     const newST = newTodos.find(t => t.iId === subTodo.iId).aSubTodos
+    //     const allChecked = newST.every(st => st.bCompleted)
+    //     newTodos = newTodos.map((t) =>
+    //         t.iId === subTodo.iId ? {
+    //             ...t,
+    //             bCompleted: allChecked
+    //         } : t
+    //     );
+    //     const curr = {
+    //         ...subTodo,
+    //         aSubTodos: newST
+    //     }
+    //     setSubTodo(curr)
+    //     setAllTodos(newTodos)
+    //     localStorage.setItem('todoData', JSON.stringify(newTodos));
+    //     updateOnCheckbox()
+    // }
 
     useEffect(() => {
         if (inputRef.current && editingSTId !== null) {
@@ -173,70 +174,12 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                         subTodo.aSubTodos.map((st, index) => (
                             <Fragment key={index}>
                                 <SingleTodo
+                                    mainTodoId={subTodo.iId}
                                     todo={st}
                                     isSub={true}
                                     updateOnCheckbox={updateOnCheckbox}
                                 />
                             </Fragment>
-                            {/* <div
-                                key={index}
-                                className={`flex items-center ${index > 0 ? 'mt-2' : ''}`}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={st.bCompleted}
-                                    onChange={() =>
-                                        handleSubTodoCheckboxChange(st.iId)
-                                    }
-                                    className="mr-4 h-5 w-7 cursor-pointer border border-black appearance-none checkbox bg-white rounded-md checked:bg-yellow-900 checked:border-transparent focus:outline-none"
-                                />
-                                {editingSTId === st.iId ? <input
-                                    type="text"
-                                    ref={inputRef}
-                                    value={subTodoText}
-                                    onChange={e => setSubTodoText(e.target.value)}
-                                    className={`box-border mr-3 mt-1 border border-gray-300 rounded-lg px-4 py-2 w-full patrick-hand-regular h-10`}
-                                /> : (
-                                    <span
-                                        className={`px-3 py-2 rounded-md p-2 ${st.bCompleted ? 'line-through text-gray-700' : ''} patrick-hand-regular cursor-pointer w-full`}
-                                        onClick={() =>
-                                            handleSubTodoCheckboxChange(st.iId)
-                                        }
-                                    >
-                                        {st.sTitle}
-                                    </span>
-                                )}
-                                {editingSTId === st.iId ? <>
-                                    <button
-                                        className='bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700'
-                                        onClick={() => handleSubTodoSave(st.iId)}
-                                    >
-                                        Save
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                        onClick={() => handleSubTodoDelete(st.iId)}
-                                    >
-                                        Delete
-                                    </button>
-                                </> : <>
-                                    <button
-                                        type="button"
-                                        className="ml-5 bg-yellow-900 text-white px-4 py-2 rounded-lg hover:bg-yellow-700"
-                                        onClick={() => handleSubTodoEdit(st.iId, st.sTitle)}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                        onClick={() => handleSubTodoDelete(st.iId)}
-                                    >
-                                        Delete
-                                    </button>
-                                </>}
-                            </div> */}
                         ))
                     }
                     {(subTodo.aSubTodos && subTodo.aSubTodos.length < 3 || !subTodo.aSubTodos) &&

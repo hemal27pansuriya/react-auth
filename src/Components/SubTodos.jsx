@@ -5,15 +5,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import { TextField, IconButton, Box } from "@mui/material";
 import SingleTodo from './SingleTodo';
 
-const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
+const SubTodos = ({ isOpen, onClose, todo, updateOnCheckboxMain }) => {
     const [validateMsg, setValidateMsg] = useState('')
-    // const [subTodoText, setSubTodoText] = useState('')
     const [subTodo, setSubTodo] = useState({})
     const [subTodoNew, setSubTodoNew] = useState('')
     const [editingSTId, setEditingSTId] = useState(null)
     const [allTodos, setAllTodos] = useState(null)
     const inputRef = useRef(null)
-    console.log('object sub todos -----')
+
     useEffect(() => {
         if (todo) {
             const latestTodos = JSON.parse(localStorage.getItem('todoData'))
@@ -62,83 +61,13 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
         updateOnCheckbox()
     }
 
-    // const handleSubTodoCheckboxChange = (iId) => {
-    //     let newTodos = allTodos.map((t) =>
-    //         t.iId === subTodo.iId ? {
-    //             ...t,
-    //             aSubTodos: t.aSubTodos.map((st) =>
-    //                 st.iId === iId ? { ...st, bCompleted: !st.bCompleted } : st
-    //             )
-    //         } : t
-    //     );
-    //     const newST = newTodos.find(t => t.iId === subTodo.iId).aSubTodos
-    //     const allChecked = newST.every(st => st.bCompleted)
-    //     newTodos = newTodos.map((t) =>
-    //         t.iId === subTodo.iId ? {
-    //             ...t,
-    //             bCompleted: allChecked
-    //         } : t
-    //     );
-    //     const curr = {
-    //         ...subTodo,
-    //         aSubTodos: newST
-    //     }
-    //     setSubTodo(curr);
-    //     setAllTodos(newTodos)
-    //     localStorage.setItem('todoData', JSON.stringify(newTodos));
-    //     updateOnCheckbox()
-    // };
-
-    // const handleSubTodoEdit = (iId, value) => {
-    //     setEditingSTId(iId);
-    //     setSubTodoText(value)
-    // }
-
-    // const handleSubTodoSave = (iId) => {
-    //     const newTodos = allTodos.map((t) =>
-    //         t.iId === subTodo.iId ? {
-    //             ...t,
-    //             aSubTodos: t.aSubTodos.map((st) =>
-    //                 st.iId === iId ? { ...st, sTitle: subTodoText } : st
-    //             )
-    //         } : t
-    //     );
-    //     const curr = {
-    //         ...subTodo,
-    //         aSubTodos: newTodos.find(t => t.iId === subTodo.iId).aSubTodos
-    //     }
-    //     setSubTodo(curr);
-    //     setAllTodos(newTodos)
-    //     setEditingSTId(null)
-    //     setSubTodoText('')
-    //     localStorage.setItem('todoData', JSON.stringify(newTodos));
-    //     updateOnCheckbox()
-    // }
-
-    // const handleSubTodoDelete = (iId) => {
-    //     let newTodos = allTodos.map((t) =>
-    //         t.iId === subTodo.iId ? {
-    //             ...t,
-    //             aSubTodos: t.aSubTodos.filter(st => st.iId !== iId)
-    //         } : t
-    //     );
-    //     const newST = newTodos.find(t => t.iId === subTodo.iId).aSubTodos
-    //     const allChecked = newST.every(st => st.bCompleted)
-    //     newTodos = newTodos.map((t) =>
-    //         t.iId === subTodo.iId ? {
-    //             ...t,
-    //             bCompleted: allChecked
-    //         } : t
-    //     );
-    //     const curr = {
-    //         ...subTodo,
-    //         aSubTodos: newST
-    //     }
-    //     setSubTodo(curr)
-    //     setAllTodos(newTodos)
-    //     localStorage.setItem('todoData', JSON.stringify(newTodos));
-    //     updateOnCheckbox()
-    // }
+    const updateOnCheckbox = () => {
+        const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
+        const currTodo = todoData.find((t) => t.iId === todo.iId);
+        setSubTodo(currTodo)
+        setAllTodos(todoData)
+        updateOnCheckboxMain()
+    }
 
     useEffect(() => {
         if (inputRef.current && editingSTId !== null) {
@@ -169,7 +98,7 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckbox }) => {
                 <div
                     className='px-6 py-4 bg-white shadow-lg rounded-b-lg'
                 >
-                    {subTodo.aSubTodos && subTodo.aSubTodos.length <= 0 && <p className='text-center font-medium'>No sub todos found</p>}
+                    {(!subTodo.aSubTodos || (subTodo.aSubTodos && subTodo.aSubTodos.length <= 0)) && <p className='text-center font-medium'>No sub todos found</p>}
                     {subTodo.aSubTodos && subTodo.aSubTodos.length > 0 &&
                         subTodo.aSubTodos.map((st, index) => (
                             <Fragment key={index}>
@@ -226,7 +155,7 @@ SubTodos.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     todo: PropTypes.object,
-    updateOnCheckbox: PropTypes.func.isRequired,
+    updateOnCheckboxMain: PropTypes.func.isRequired,
 }
 
 export default SubTodos;

@@ -29,29 +29,15 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
             }
             setSingleTodo(latestSingleTodo)
             setAllTodos(latestTodos)
-            console.log('object: ', latestSingleTodo, latestTodos);
+            if (isSub) setEditingId(null)
         }
     }, [todo, todos])
-
-    // useEffect(() => {
-    //         const latestTodos = JSON.parse(localStorage.getItem('todoData'))
-    //         let latestSingleTodo
-    //         if (isSub) {
-    //             latestSingleTodo = latestTodos.find(t => t.iId === mainTodoId)
-    //             latestSingleTodo = latestSingleTodo.aSubTodos.find(st => st.iId === todo.iId)
-    //         } else {
-    //             latestSingleTodo = latestTodos.find(t => t.iId === todo.iId)
-    //         }
-    //         setSingleTodo(latestSingleTodo)
-    //         setAllTodos(latestTodos)
-    //         console.log('object: ', latestSingleTodo, latestTodos);
-    // }, [allTodos])
 
     const handleUpdateTodo = () => {
         let newTodo, newAllTodos
         if (isSub) {
             newAllTodos = allTodos.map((t) =>
-                t.iId === singleTodo.iId ? {
+                t.iId === mainTodoId ? {
                     ...t,
                     aSubTodos: t.aSubTodos.map((st) =>
                         st.iId === editingId ? { ...st, sTitle: editTodoText } : st
@@ -60,49 +46,46 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
             );
             newTodo = {
                 ...singleTodo,
-                aSubTodos: newAllTodos.find(t => t.iId === singleTodo.iId).aSubTodos
+                sTitle: editTodoText
             }
             setEditTodoText('')
-            updateOnCheckbox()
         } else {
             newAllTodos = allTodos.map((todo) =>
                 todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
             )
             newTodo = newAllTodos.find((t) => t.iId === editingId);
             if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
-            console.log('object123--------------------------------', newAllTodos, singleTodo);
         }
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
         setEditingId(null);
         setSingleTodo(newTodo);
         setAllTodos(newAllTodos);
-        console.log('object34dd,', allTodos);
+        updateOnCheckbox()
     };
 
     const handleCheckbox = (iId) => {
         let newTodo, newAllTodos
         if (isSub) {
             newAllTodos = allTodos.map((t) =>
-                t.iId === singleTodo.iId ? {
+                t.iId === mainTodoId ? {
                     ...t,
                     aSubTodos: t.aSubTodos.map((st) =>
                         st.iId === iId ? { ...st, bCompleted: !st.bCompleted } : st
                     )
                 } : t
             );
-            const newST = newAllTodos.find(t => t.iId === singleTodo.iId).aSubTodos
+            const newST = newAllTodos.find(t => t.iId === mainTodoId).aSubTodos
             const allChecked = newST.every(st => st.bCompleted)
             newAllTodos = newAllTodos.map((t) =>
-                t.iId === singleTodo.iId ? {
+                t.iId === mainTodoId ? {
                     ...t,
                     bCompleted: allChecked
                 } : t
             );
             newTodo = {
                 ...singleTodo,
-                aSubTodos: newST
+                bCompleted: !singleTodo.bCompleted
             }
-            updateOnCheckbox()
         } else {
             newTodo = {
                 ...singleTodo, bCompleted: !singleTodo.bCompleted, aSubTodos: singleTodo?.aSubTodos?.map(st => { return { ...st, bCompleted: !singleTodo.bCompleted } }) || []
@@ -115,6 +98,7 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
         setSingleTodo(newTodo);
         setAllTodos(newAllTodos);
         localStorage.setItem('todoData', JSON.stringify(newAllTodos))
+        updateOnCheckbox()
     }
 
     const handleOpenSubTodoModal = (todo) => {
@@ -134,23 +118,20 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
 
     const handleSubTodoDelete = () => {
         let newTodos = allTodos.map((t) =>
-            t.iId === singleTodo.iId ? {
+            t.iId === mainTodoId ? {
                 ...t,
                 aSubTodos: t.aSubTodos.filter(st => st.iId !== singleTodo.iId)
             } : t
         );
-        const newST = newTodos.find(t => t.iId === singleTodo.iId).aSubTodos
+        const newST = newTodos.find(t => t.iId === mainTodoId).aSubTodos
         const allChecked = newST.every(st => st.bCompleted)
         newTodos = newTodos.map((t) =>
-            t.iId === singleTodo.iId ? {
+            t.iId === mainTodoId ? {
                 ...t,
                 bCompleted: allChecked
             } : t
         );
-        const curr = {
-            ...singleTodo,
-            aSubTodos: newST
-        }
+        const curr = null
         setSingleTodo(curr)
         setAllTodos(newTodos)
         localStorage.setItem('todoData', JSON.stringify(newTodos));
@@ -158,18 +139,10 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
     }
 
     return (
-        <div
+        singleTodo && <div
             key={key}
             className={`flex items-center ${key > 0 ? 'mt-2' : ''}`}
         >
-            <input
-                type="checkbox"
-                checked={singleTodo.bCompleted}
-                onChange={() =>
-                    handleCheckbox(singleTodo.iId)
-                }
-                className="mr-4 h-5 w-7 cursor-pointer appearance-none checkbox bg-white rounded-md checked:bg-yellow-900 checked:border-transparent focus:outline-none"
-            />
             {editingId === singleTodo.iId ? (
                 <form
                     onSubmit={(e) => {
@@ -178,6 +151,14 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
                     }}
                     style={{ display: 'flex', alignItems: 'center', width: '100%' }}
                 >
+                    <input
+                        type="checkbox"
+                        checked={singleTodo.bCompleted}
+                        onChange={() =>
+                            handleCheckbox(singleTodo.iId)
+                        }
+                        className={`mr-4 h-5 w-7 cursor-pointer appearance-none checkbox ${isSub ? 'border border-black' : ''} bg-white rounded-md checked:bg-yellow-900 checked:border-transparent focus:outline-none`}
+                    />
                     <input
                         type="text"
                         ref={inputRef}
@@ -203,6 +184,14 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
                     </button>
                 </form>
             ) : (<>
+                <input
+                    type="checkbox"
+                    checked={singleTodo.bCompleted}
+                    onChange={() =>
+                        handleCheckbox(singleTodo.iId)
+                    }
+                    className={`mr-4 h-5 w-7 cursor-pointer appearance-none checkbox ${isSub ? 'border border-black' : ''} bg-white rounded-md checked:bg-yellow-900 checked:border-transparent focus:outline-none`}
+                />
                 <span
                     className={`px-3 py-2 rounded-md p-2 ${singleTodo.bCompleted ? 'line-through text-gray-700' : ''} patrick-hand-regular cursor-pointer w-full`}
                     onClick={() =>

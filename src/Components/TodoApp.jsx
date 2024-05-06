@@ -13,11 +13,8 @@ const TodoApp = ({ sUsername }) => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [openTodo, setOpenTodo] = useState(null)
     const [validateMsg, setValidateMsg] = useState('')
-    // const [editingId, setEditingId] = useState(null)
     const [deletingId, setDeletingId] = useState(null)
     const [todoNew, setTodoNew] = useState('')
-    // const [editTodoText, setEditTodoText] = useState('')
-    // const inputRef = useRef(null)
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
@@ -25,12 +22,6 @@ const TodoApp = ({ sUsername }) => {
         setTodos(currTodos)
         setAllTodos(todoData)
     }, [sUsername])
-
-    // useEffect(() => {
-    //     if (inputRef.current && editingId !== null) {
-    //         inputRef.current.focus();
-    //     }
-    // }, [editingId]);
 
     const handleAddTodo = (e) => {
         e.preventDefault()
@@ -49,20 +40,6 @@ const TodoApp = ({ sUsername }) => {
         setTodoNew('')
     };
 
-    // const handleUpdateTodo = () => {
-    //     const newTodos = todos.map((todo) =>
-    //         todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
-    //     );
-    //     const newAllTodos = allTodos.map((todo) =>
-    //         todo.iId === editingId ? { ...todo, sTitle: editTodoText } : todo
-    //     )
-    //     setTodos(newTodos);
-    //     setAllTodos(newAllTodos);
-    //     if (openTodo && openTodo.iId === editingId) setOpenTodo({ ...openTodo, sTitle: editTodoText })
-    //     localStorage.setItem('todoData', JSON.stringify(newAllTodos))
-    //     setEditingId(null);
-    // };
-
     const handleDeleteTodo = () => {
         const newTodos = todos.filter((todo) => todo.iId !== deletingId);
         const newAllTodos = allTodos.filter((todo) => todo.iId !== deletingId);
@@ -78,31 +55,6 @@ const TodoApp = ({ sUsername }) => {
         setIsConfirmModalOpen(true)
     }
 
-    // const handleCheckbox = (iId) => {
-    //     const newTodos = todos.map((t) =>
-    //         t.iId === iId ? {
-    //             ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || []
-    //         } : t
-    //     );
-    //     const newAllTodos = allTodos.map((t) =>
-    //         t.iId === iId ? { ...t, bCompleted: !t.bCompleted, aSubTodos: t?.aSubTodos?.map(st => { return { ...st, bCompleted: !t.bCompleted } }) || [] } : t
-    //     )
-    //     setTodos(newTodos);
-    //     setAllTodos(newAllTodos);
-    //     if (openTodo && openTodo.iId === iId) setOpenTodo({ ...openTodo, bCompleted: !openTodo.bCompleted })
-    //     localStorage.setItem('todoData', JSON.stringify(newAllTodos))
-    // }
-
-    // const handleOpenSubTodoModal = (todo) => {
-    //     if (todo.iId === openTodo?.iId) {
-    //         setOpenTodo(openTodo ? null : todo)
-    //         setIsSubModalOpen(openTodo ? false : true)
-    //     } else {
-    //         setOpenTodo(todo)
-    //         setIsSubModalOpen(true)
-    //     }
-    // }
-
     const handleCloseSubModal = () => {
         setIsSubModalOpen(false)
         setOpenTodo(null)
@@ -111,15 +63,9 @@ const TodoApp = ({ sUsername }) => {
     const updateOnCheckbox = () => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
         const currTodos = todoData.filter((todo) => todo.sUsername === sUsername);
-        console.log('105-', currTodos)
         setTodos(currTodos)
         setAllTodos(todoData)
     }
-
-    // const handleTodoEdit = (iId, value) => {
-    //     setEditingId(iId);
-    //     setEditTodoText(value)
-    // }
 
     return (
         <div className="container mx-auto p-4 flex">
@@ -162,18 +108,19 @@ const TodoApp = ({ sUsername }) => {
                                 setOpenTodo={setOpenTodo}
                                 openTodo={openTodo}
                                 setIsSubModalOpen={setIsSubModalOpen}
+                                updateOnCheckbox={updateOnCheckbox}
                             />
                         </Fragment>
                     ))
                     }
-                </div >
+                </div>
                 <ConfirmModal
                     isOpen={isConfirmModalOpen}
                     onClose={() => setIsConfirmModalOpen(false)}
                     onSubmit={handleDeleteTodo}
                     title='Are you sure want to delete?'
                 />
-            </div >
+            </div>
             {
                 isSubModalOpen && (
                     <div className="w-1/2 pl-5">
@@ -182,7 +129,7 @@ const TodoApp = ({ sUsername }) => {
                             onClose={handleCloseSubModal}
                             todo={openTodo}
                             allTodos={allTodos}
-                            updateOnCheckbox={updateOnCheckbox}
+                            updateOnCheckboxMain={updateOnCheckbox}
                         />
                     </div>
                 )

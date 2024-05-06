@@ -116,7 +116,7 @@ const Login = () => {
                             Login
                         </button>
                     </form>
-                    <p className='mt-2 text-center text-sm text-gray-600'>
+                    <p className='mt-2 text-center text-sm text-gray-600 cursor-pointer'>
                         Not registered?
                         <a onClick={() => navigate('/register')} className="ml-1 font-medium text-indigo-600 hover:text-indigo-500">
                             Register Here

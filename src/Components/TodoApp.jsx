@@ -86,7 +86,7 @@ const TodoApp = ({ sUsername }) => {
                             />
                             <button
                                 type='submit'
-                                className="bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-800 h-10"
+                                className="bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700 h-10"
                             >
                                 Add
                             </button>

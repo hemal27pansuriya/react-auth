@@ -4,6 +4,7 @@ import ConfirmModal from './ConfirmModal';
 import { v4 as uuidv4 } from "uuid";
 import SubTodos from './SubTodos';
 import SingleTodo from './SingleTodo';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const TodoApp = ({ sUsername }) => {
     const [todos, setTodos] = useState([]);
@@ -15,6 +16,20 @@ const TodoApp = ({ sUsername }) => {
     const [validateMsg, setValidateMsg] = useState('')
     const [deletingId, setDeletingId] = useState(null)
     const [todoNew, setTodoNew] = useState('')
+    const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        const handlePopState = () => {
+            navigate('/dashboard', { replace: true });
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, [])
 
     useEffect(() => {
         const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
@@ -22,6 +37,22 @@ const TodoApp = ({ sUsername }) => {
         setTodos(currTodos)
         setAllTodos(todoData)
     }, [sUsername])
+
+
+    useEffect(() => {
+        const todoId = searchParams.get('todoId');
+        if (todoId) {
+            const id = todoId
+            const todoData = JSON.parse(localStorage.getItem('todoData')) || [];
+            const currTodo = todoData.find((todo) => todo.iId === id);
+            setAllTodos(todoData)
+            setOpenTodo(currTodo)
+            setIsSubModalOpen(true)
+        } else {
+            setOpenTodo(null)
+            setIsSubModalOpen(false)
+        }
+    }, [searchParams]);
 
     const handleAddTodo = (e) => {
         e.preventDefault()
@@ -58,6 +89,7 @@ const TodoApp = ({ sUsername }) => {
     const handleCloseSubModal = () => {
         setIsSubModalOpen(false)
         setOpenTodo(null)
+        navigate('/dashboard', { replace: true });
     }
 
     const updateOnCheckbox = () => {
@@ -109,6 +141,7 @@ const TodoApp = ({ sUsername }) => {
                                 openTodo={openTodo}
                                 setIsSubModalOpen={setIsSubModalOpen}
                                 updateOnCheckbox={updateOnCheckbox}
+                                setSearchParams={setSearchParams}
                             />
                         </Fragment>
                     ))

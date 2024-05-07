@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { TextField, IconButton, Box } from "@mui/material";
 import SingleTodo from './SingleTodo';
 
-const SubTodos = ({ isOpen, onClose, todo, updateOnCheckboxMain }) => {
+const SubTodos = ({ onClose, todo, updateOnCheckboxMain }) => {
     const [validateMsg, setValidateMsg] = useState('')
     const [subTodo, setSubTodo] = useState({})
     const [subTodoNew, setSubTodoNew] = useState('')
@@ -79,7 +79,6 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckboxMain }) => {
         <>
             <h1 className="text-2xl font-bold mb-4 text-center">Sub Todos</h1>
             <div
-                open={isOpen}
                 className='w-full relative'
             >
                 <div className='bg-texture p-4 pr-10 rounded-t-lg'>
@@ -146,13 +145,12 @@ const SubTodos = ({ isOpen, onClose, todo, updateOnCheckboxMain }) => {
                         </form>}
                     {validateMsg && <p className='text-red-500 text-xs'>{validateMsg}</p>}
                 </div>
-            </div >
+            </div>
         </>
     )
 };
 
 SubTodos.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     todo: PropTypes.object,
     updateOnCheckboxMain: PropTypes.func.isRequired,

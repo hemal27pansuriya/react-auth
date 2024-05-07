@@ -3,13 +3,15 @@ import { useRef, useEffect, useState } from 'react'
 import IconButton from '@mui/material/IconButton';
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { Tooltip } from '@mui/material'
+import { useNavigate } from 'react-router-dom';
 
-const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleConfirmModal, setIsSubModalOpen, key, openTodo, setOpenTodo }) => {
+const SingleTodo = ({ todo, todos, setSearchParams, isSub, mainTodoId, updateOnCheckbox, handleConfirmModal, setIsSubModalOpen, key, openTodo, setOpenTodo }) => {
     const inputRef = useRef(null)
     const [editingId, setEditingId] = useState(null)
     const [editTodoText, setEditTodoText] = useState('')
     const [singleTodo, setSingleTodo] = useState({})
     const [allTodos, setAllTodos] = useState([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (inputRef.current && editingId !== null) {
@@ -103,11 +105,13 @@ const SingleTodo = ({ todo, todos, isSub, mainTodoId, updateOnCheckbox, handleCo
 
     const handleOpenSubTodoModal = (todo) => {
         if (todo.iId === openTodo?.iId) {
-            setOpenTodo(openTodo ? null : todo)
-            setIsSubModalOpen(openTodo ? false : true)
+            setOpenTodo(null)
+            setIsSubModalOpen(false)
+            navigate('/dashboard');
         } else {
             setOpenTodo(todo)
             setIsSubModalOpen(true)
+            setSearchParams({ todoId: todo.iId })
         }
     }
 
@@ -237,7 +241,8 @@ SingleTodo.propTypes = {
     setOpenTodo: PropTypes.func,
     updateOnCheckbox: PropTypes.func,
     mainTodoId: PropTypes.string,
-    todos: PropTypes.array
+    todos: PropTypes.array,
+    setSearchParams: PropTypes.func
 }
 
 export default SingleTodo

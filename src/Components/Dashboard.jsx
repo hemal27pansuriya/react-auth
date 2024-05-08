@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
-// import TodoApp from "./TodoApp";
 
 const Dashboard = () => {
   const navigate = useNavigate()

@@ -96,74 +96,93 @@ const TodoApp = () => {
         setAllTodos(todoData)
     }
 
+    const handleLogout = () => {
+        localStorage.removeItem('currentUser')
+        setsUsername('')
+        return navigate('/login')
+    }
+
     return (
-        <div className="container mx-auto p-4 flex">
-            <div className='todo-app w-1/2'>
-                <h1 className="text-2xl font-bold mb-4 text-center">Todo App</h1>
-                <form onSubmit={handleAddTodo}>
-                    <div className='mb-5 rounded-lg p-5 bg-texture shadow-lg'>
-                        <div className='flex'>
-                            <input
-                                type="text"
-                                value={todoNew}
-                                onChange={(e) => {
-                                    setValidateMsg('')
-                                    setTodoNew(e.target.value)
-                                }}
-                                className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full patrick-hand-regular h-10"
-                                placeholder="Enter todo..."
-                            />
-                            <button
-                                type='submit'
-                                className="bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700 h-10"
-                            >
-                                Add
-                            </button>
+        <div className="h-screen w-full flex flex-col">
+            <nav className="bg-blue-500 p-4 flex justify-between items-center">
+                <div className="text-white text-2xl font-semibold">Hello, {sUsername}</div>
+                <button onClick={handleLogout} className="bg-indigo-700 hover:bg-indigo-800 text-white font-semibold py-2 px-4 rounded">
+                    Logout
+                </button>
+            </nav>
+            <div className="container mx-auto p-4 flex">
+                <div className='todo-app w-1/2'>
+                    <h1 className="text-2xl font-bold mb-4 text-center">Todo App</h1>
+                    <form onSubmit={handleAddTodo}>
+                        <div className='mb-5 rounded-lg p-5 bg-texture shadow-lg'>
+                            <div className='flex'>
+                                <input
+                                    type="text"
+                                    value={todoNew}
+                                    onChange={(e) => {
+                                        setValidateMsg('')
+                                        setTodoNew(e.target.value)
+                                    }}
+                                    className="mr-3 border border-gray-300 rounded-lg px-4 py-2 w-full patrick-hand-regular h-10"
+                                    placeholder="Enter todo..."
+                                />
+                                <button
+                                    type='submit'
+                                    className="bg-yellow-900 text-white rounded-lg px-4 py-2 hover:bg-yellow-700 h-10"
+                                >
+                                    Add
+                                </button>
+                            </div>
+                            {validateMsg && <p className='text-red-600 font-semibold text-xs mt-2'>{validateMsg}</p>}
                         </div>
-                        {validateMsg && <p className='text-red-600 font-semibold text-xs mt-2'>{validateMsg}</p>}
+                    </form>
+                    <div
+                        className='overflow-y-auto'
+                        style={{ height: '65vh' }}
+                    >
+                        <div
+                            className='p-5 rounded-lg bg-texture shadow-lg'
+                        >
+                            {todos.length <= 0 && <p className='text-center font-medium'>No todos found</p>}
+                            {todos.length > 0 && todos.map((todo, index) => (
+                                <Fragment key={index}>
+                                    <SingleTodo
+                                        todo={todo}
+                                        todos={todos}
+                                        handleConfirmModal={handleConfirmModal}
+                                        isSub={false}
+                                        setOpenTodo={setOpenTodo}
+                                        openTodo={openTodo}
+                                        setIsSubModalOpen={setIsSubModalOpen}
+                                        updateOnCheckbox={updateOnCheckbox}
+                                        setSearchParams={setSearchParams}
+                                    />
+                                </Fragment>
+                            ))
+                            }
+                        </div>
                     </div>
-                </form>
-                <div
-                    className='p-5 rounded-lg bg-texture shadow-lg'
-                >
-                    {todos.length <= 0 && <p className='text-center font-medium'>No todos found</p>}
-                    {todos.length > 0 && todos.map((todo, index) => (
-                        <Fragment key={index}>
-                            <SingleTodo
-                                todo={todo}
-                                todos={todos}
-                                handleConfirmModal={handleConfirmModal}
-                                isSub={false}
-                                setOpenTodo={setOpenTodo}
-                                openTodo={openTodo}
-                                setIsSubModalOpen={setIsSubModalOpen}
-                                updateOnCheckbox={updateOnCheckbox}
-                                setSearchParams={setSearchParams}
-                            />
-                        </Fragment>
-                    ))
-                    }
+                    <ConfirmModal
+                        isOpen={isConfirmModalOpen}
+                        onClose={() => setIsConfirmModalOpen(false)}
+                        onSubmit={handleDeleteTodo}
+                        title='Are you sure want to delete?'
+                    />
                 </div>
-                <ConfirmModal
-                    isOpen={isConfirmModalOpen}
-                    onClose={() => setIsConfirmModalOpen(false)}
-                    onSubmit={handleDeleteTodo}
-                    title='Are you sure want to delete?'
-                />
+                {
+                    isSubModalOpen && (
+                        <div className="w-1/2 pl-5">
+                            <SubTodos
+                                isOpen={isSubModalOpen}
+                                onClose={handleCloseSubModal}
+                                todo={openTodo}
+                                allTodos={allTodos}
+                                updateOnCheckboxMain={updateOnCheckbox}
+                            />
+                        </div>
+                    )
+                }
             </div>
-            {
-                isSubModalOpen && (
-                    <div className="w-1/2 pl-5">
-                        <SubTodos
-                            isOpen={isSubModalOpen}
-                            onClose={handleCloseSubModal}
-                            todo={openTodo}
-                            allTodos={allTodos}
-                            updateOnCheckboxMain={updateOnCheckbox}
-                        />
-                    </div>
-                )
-            }
         </div>
     );
 };

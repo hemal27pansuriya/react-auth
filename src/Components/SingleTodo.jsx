@@ -107,11 +107,11 @@ const SingleTodo = ({ todo, todos, setSearchParams, isSub, mainTodoId, updateOnC
         if (todo.iId === openTodo?.iId) {
             setOpenTodo(null)
             setIsSubModalOpen(false)
-            navigate('/dashboard');
+            navigate('/todo-app');
         } else {
             setOpenTodo(todo)
             setIsSubModalOpen(true)
-            setSearchParams({ todoId: todo.iId })
+            setSearchParams({ todoId: todo.iId }, { replace: true })
         }
     }
 
@@ -213,7 +213,7 @@ const SingleTodo = ({ todo, todos, setSearchParams, isSub, mainTodoId, updateOnC
                 </button>
                 <button
                     type="button"
-                    className="ml-3 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                    className="ml-3 mr-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                     onClick={() => {
                         if (isSub) handleSubTodoDelete()
                         else handleConfirmModal(singleTodo, true)

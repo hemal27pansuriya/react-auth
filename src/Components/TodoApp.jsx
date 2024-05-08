@@ -1,12 +1,11 @@
 import { useEffect, useState, Fragment } from 'react';
-import PropTypes from 'prop-types'
 import ConfirmModal from './ConfirmModal';
 import { v4 as uuidv4 } from "uuid";
 import SubTodos from './SubTodos';
 import SingleTodo from './SingleTodo';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-const TodoApp = ({ sUsername }) => {
+const TodoApp = () => {
     const [todos, setTodos] = useState([]);
     // eslint-disable-next-line no-unused-vars
     const [allTodos, setAllTodos] = useState([])
@@ -18,17 +17,15 @@ const TodoApp = ({ sUsername }) => {
     const [todoNew, setTodoNew] = useState('')
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams();
+    const [sUsername, setsUsername] = useState('')
 
     useEffect(() => {
-        const handlePopState = () => {
-            navigate('/dashboard', { replace: true });
-        };
-
-        window.addEventListener('popstate', handlePopState);
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
+        const currentUser = localStorage.getItem('currentUser')
+        if (!currentUser) {
+            navigate('/login')
+        } else {
+            setsUsername(currentUser)
+        }
     }, [])
 
     useEffect(() => {
@@ -89,7 +86,7 @@ const TodoApp = ({ sUsername }) => {
     const handleCloseSubModal = () => {
         setIsSubModalOpen(false)
         setOpenTodo(null)
-        navigate('/dashboard', { replace: true });
+        navigate('/todo-app', { replace: true });
     }
 
     const updateOnCheckbox = () => {
@@ -170,9 +167,5 @@ const TodoApp = ({ sUsername }) => {
         </div>
     );
 };
-
-TodoApp.propTypes = {
-    sUsername: PropTypes.string.isRequired
-}
 
 export default TodoApp;
